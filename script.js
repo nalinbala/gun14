@@ -751,10 +751,9 @@ function applyGenderForces() {
   const yM = isMobileView ? height * 0.35 : height / 2;
   const yF = isMobileView ? height * 0.7 : height / 2;
 
-  // MATCHING MOCKUP 3: Exact formatting
   if (isMobileView) {
-    addSvgLabel("Male 54", xM, yM + 140, "20px");
-    addSvgLabel("Female 06", xF, yF + 60, "20px");
+    addSvgLabel("Male (54)", xM, yM + 140, "20px");
+    addSvgLabel("Female (6)", xF, yF + 60, "20px");
   } else {
     addSvgLabel("Male (54)", xM, yM + 200);
     addSvgLabel("Female (6)", xF, yF + 200);
@@ -776,12 +775,9 @@ function applyMotivationForces() {
   const yC = isMobileView ? height * 0.35 : height / 2;
   const yP = isMobileView ? height * 0.7 : height / 2;
 
-  // MATCHING MOCKUP 4: Custom multiline text splits
   if (isMobileView) {
-    addSvgLabel("Organised crime 46", xC, yC + 130, "20px");
-    addSvgLabel("Personal", xP, yP + 70, "18px");
-    addSvgLabel("dispute/ Other", xP, yP + 95, "18px");
-    addSvgLabel("14", xP, yP + 120, "20px");
+    addSvgLabel("Organised Crime (46)", xC, yC + 130, "20px");
+    addSvgLabel("Personal/Other (14)", xP, yP + 80, "20px");
   } else {
     addSvgLabel("Organised Crime (46)", xC, yC + 250);
     addSvgLabel("Personal/Other (14)", xP, yP + 200);
@@ -822,35 +818,23 @@ function applyDistrictForces() {
   );
 
   if (isMobileView) {
-    // MATCHING MOCKUP 5: Custom Grid Order (3, 3, 2, 2 pyramid)
-    const mobLoc = {
-      kurunegala: { row: 0, col: 0, maxCols: 3 },
-      ratnapura: { row: 0, col: 1, maxCols: 3 },
-      mannar: { row: 0, col: 2, maxCols: 3 },
-      puttalam: { row: 1, col: 0, maxCols: 3 },
-      kalutara: { row: 1, col: 1, maxCols: 3 },
-      matara: { row: 1, col: 2, maxCols: 3 },
-      gampaha: { row: 2, col: 0, maxCols: 2 },
-      hambantota: { row: 2, col: 1, maxCols: 2 },
-      galle: { row: 3, col: 0, maxCols: 2 },
-      colombo: { row: 3, col: 1, maxCols: 2 },
-    };
+    // MOBILE VIEW: 3 Columns, NO NUMBERS OR BADGES
+    const cols = 3;
+    const colWidth = width / (cols + 1);
+    const rowHeight = height * 0.18; // Tight, clean spacing
+    const dotBaseY = height * 0.22;
 
-    const yBase = height * 0.18;
-    const yGap = 160;
+    districtsDesktop.forEach((dist, i) => {
+      let xPos = ((i % cols) + 1) * colWidth;
+      let yPosLabel = dotBaseY + Math.floor(i / cols) * rowHeight + 50;
 
-    Object.keys(mobLoc).forEach((dist) => {
-      let conf = mobLoc[dist];
-      let xPos = (conf.col + 1) * (width / (conf.maxCols + 1));
-      let yPos = yBase + conf.row * yGap;
-
-      // NO black badges, just clean text
       d3.select("#labels")
         .append("text")
         .attr("x", xPos)
-        .attr("y", yPos + 60)
+        .attr("y", yPosLabel)
         .attr("text-anchor", "middle")
-        .style("font-size", "18px")
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
         .style("fill", "#1a1a1a")
         .text(dist.charAt(0).toUpperCase() + dist.slice(1));
     });
@@ -860,10 +844,8 @@ function applyDistrictForces() {
         "x",
         d3
           .forceX((d) => {
-            let conf = mobLoc[d.district];
-            return conf
-              ? (conf.col + 1) * (width / (conf.maxCols + 1))
-              : width / 2;
+            const i = districtsDesktop.indexOf(d.district);
+            return ((i % cols) + 1) * colWidth;
           })
           .strength(0.8)
       )
@@ -871,27 +853,24 @@ function applyDistrictForces() {
         "y",
         d3
           .forceY((d) => {
-            let conf = mobLoc[d.district];
-            return conf ? yBase + conf.row * yGap : height / 2;
+            const i = districtsDesktop.indexOf(d.district);
+            return dotBaseY + Math.floor(i / cols) * rowHeight;
           })
           .strength(0.8)
       )
       .alpha(1)
       .restart();
   } else {
-    // FIX: Desktop layout split into two rows of 5
+    // DESKTOP VIEW: Split into two rows of 5 WITH numbers
     const colsDesk = 5;
     const colWidthDesk = width / (colsDesk + 1);
-
-    // Using the exact same height math as the Month view for consistency
     const rowHeightDesk = height * 0.32;
     const dotBaseYDesk = height * 0.4;
 
     districtsDesktop.forEach((dist, i) => {
       let xPos = ((i % colsDesk) + 1) * colWidthDesk;
-      let labelOffset = 90;
       let yPosLabel =
-        dotBaseYDesk + Math.floor(i / colsDesk) * rowHeightDesk + labelOffset;
+        dotBaseYDesk + Math.floor(i / colsDesk) * rowHeightDesk + 90;
 
       const group = d3.select("#labels");
       group
@@ -980,68 +959,109 @@ function applyMonthForces() {
     (d) => (monthCounts[d.month] = (monthCounts[d.month] || 0) + 1)
   );
 
-  const cols = isMobileView ? 3 : 6;
-  const colWidth = width / (cols + 1);
+  if (isMobileView) {
+    // MOBILE VIEW: 3 Columns, NO NUMBERS OR BADGES
+    const cols = 3;
+    const colWidth = width / (cols + 1);
+    const rowHeight = height * 0.18;
+    const dotBaseY = height * 0.22;
 
-  // FIX: Shifted desktop starting position down (from 0.30 to 0.40) to clear the text.
-  // Tightened desktop row gap slightly (from 0.35 to 0.32) so the bottom row stays visible.
-  const rowHeight = isMobileView ? 140 : height * 0.32;
-  const dotBaseY = isMobileView ? height * 0.22 : height * 0.4;
+    months.forEach((month, i) => {
+      const xPos = ((i % cols) + 1) * colWidth;
+      const yPosLabel = dotBaseY + Math.floor(i / cols) * rowHeight + 50;
 
-  months.forEach((month, i) => {
-    const xPos = ((i % cols) + 1) * colWidth;
+      d3.select("#labels")
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", yPosLabel)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
+        .style("fill", "#1a1a1a")
+        .text(shortMonths[i]);
+    });
 
-    const labelOffset = isMobileView ? 50 : 90;
-    const yPosLabel = dotBaseY + Math.floor(i / cols) * rowHeight + labelOffset;
+    simulation
+      .force(
+        "x",
+        d3
+          .forceX((d) => {
+            const i = months.indexOf(d.month);
+            return ((i % cols) + 1) * colWidth;
+          })
+          .strength(0.8)
+      )
+      .force(
+        "y",
+        d3
+          .forceY((d) => {
+            const i = months.indexOf(d.month);
+            return dotBaseY + Math.floor(i / cols) * rowHeight;
+          })
+          .strength(0.8)
+      )
+      .alpha(1)
+      .restart();
+  } else {
+    // DESKTOP VIEW: 6 columns, WITH badges
+    const cols = 6;
+    const colWidth = width / (cols + 1);
+    const rowHeight = height * 0.32;
+    const dotBaseY = height * 0.4;
 
-    const group = d3.select("#labels");
-    group
-      .append("text")
-      .attr("x", xPos)
-      .attr("y", yPosLabel)
-      .attr("text-anchor", "middle")
-      .style("font-size", isMobileView ? "18px" : "22px")
-      .style("font-weight", "bold")
-      .style("fill", "#1a1a1a")
-      .text(shortMonths[i]);
-    group
-      .append("circle")
-      .attr("cx", xPos)
-      .attr("cy", yPosLabel + 25)
-      .attr("r", isMobileView ? 14 : 18)
-      .style("fill", "#000");
-    group
-      .append("text")
-      .attr("x", xPos)
-      .attr("y", yPosLabel + 25)
-      .attr("dy", "0.35em")
-      .attr("text-anchor", "middle")
-      .style("fill", "#fff")
-      .style("font-size", isMobileView ? "14px" : "16px")
-      .text(monthCounts[month] || 0);
-  });
+    months.forEach((month, i) => {
+      const xPos = ((i % cols) + 1) * colWidth;
+      const yPosLabel = dotBaseY + Math.floor(i / cols) * rowHeight + 90;
 
-  simulation
-    .force(
-      "x",
-      d3
-        .forceX((d) => {
-          const i = months.indexOf(d.month);
-          return ((i % cols) + 1) * colWidth;
-        })
-        .strength(0.8)
-    )
-    .force(
-      "y",
-      d3
-        .forceY((d) => {
-          const i = months.indexOf(d.month);
-          return Math.floor(i / cols) * rowHeight + dotBaseY;
-        })
-        .strength(0.8)
-    )
-    .alpha(1)
-    .restart();
+      const group = d3.select("#labels");
+      group
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", yPosLabel)
+        .attr("text-anchor", "middle")
+        .style("font-size", "22px")
+        .style("font-weight", "bold")
+        .style("fill", "#1a1a1a")
+        .text(shortMonths[i]);
+      group
+        .append("circle")
+        .attr("cx", xPos)
+        .attr("cy", yPosLabel + 25)
+        .attr("r", 18)
+        .style("fill", "#000");
+      group
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", yPosLabel + 25)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "middle")
+        .style("fill", "#fff")
+        .style("font-size", "16px")
+        .text(monthCounts[month] || 0);
+    });
+
+    simulation
+      .force(
+        "x",
+        d3
+          .forceX((d) => {
+            const i = months.indexOf(d.month);
+            return ((i % cols) + 1) * colWidth;
+          })
+          .strength(0.8)
+      )
+      .force(
+        "y",
+        d3
+          .forceY((d) => {
+            const i = months.indexOf(d.month);
+            return dotBaseY + Math.floor(i / cols) * rowHeight;
+          })
+          .strength(0.8)
+      )
+      .alpha(1)
+      .restart();
+  }
 }
 
 /* ========================================= */
