@@ -46,29 +46,26 @@ function renderIntro() {
 }
 
 // ==========================================
-// 2. D3.JS DATA VISUALIZATION
+// RESPONSIVE DIMENSIONS & DOT SIZES
 // ==========================================
 const svg = d3.select("#visual-stage");
-
-// 1. TRUE RESPONSIVE: Measure the user's exact screen dimensions
 const width = window.innerWidth;
 const height = window.innerHeight;
 const isMobileView = width < 768;
 
-// 2. Mathematically smaller dots (from 11 to 9) to reduce crowding
-const radius = isMobileView ? 9 : 18;
-
-// 3. Set the SVG to match the screen perfectly
+// Increased dot size drastically to match mockup
+const radius = isMobileView ? 12 : 18;
 svg.attr("width", width).attr("height", height);
 
-// Colors matching your palette
-const COLOR_MALE = "#3E5C76";
-const COLOR_FEMALE = "#EE6C4D";
+// ==========================================
+// RESTORED COLORS AND SCALES
+// ==========================================
+const COLOR_MALE = "#3e5c76";
+const COLOR_FEMALE = "#ee6c4d";
 
-// ADD THIS: Age Color Scale based on your image
 const ageColorScale = d3
   .scaleLinear()
-  .domain([6, 12, 18, 30, 45, 60, 68]) // Input ages from image
+  .domain([6, 12, 18, 30, 45, 60, 68])
   .range([
     "#1e6b3c",
     "#4cb050",
@@ -77,13 +74,11 @@ const ageColorScale = d3
     "#f44336",
     "#b71c1c",
     "#880e4f",
-  ]) // Matching colors
-  .interpolate(d3.interpolateRgb); // Smoothly interpolates the RGB colors
+  ]);
 
-let simulation;
-let nodes;
-
-// The Data
+// ==========================================
+// YOUR ORIGINAL DATA
+// ==========================================
 const shootingData = [
   {
     id: "m_01",
@@ -567,88 +562,50 @@ const shootingData = [
   },
 ];
 
-initD3Physics(shootingData);
+// Connect your data to the D3 simulation engine!
+const nodes = shootingData;
 
-function initD3Physics(data) {
-  nodes = data;
+// ==========================================
+// SIMULATION & DRAWING THE DOTS
+// ==========================================
+const simulation = d3
+  .forceSimulation(nodes)
+  .force(
+    "collide",
+    d3
+      .forceCollide()
+      .radius(radius + 1.5)
+      .iterations(2)
+  )
+  .force("x", d3.forceX(width / 2).strength(0.05))
+  .force("y", d3.forceY(height / 2).strength(0.05));
 
-  nodes.forEach((d) => {
-    d.x = width / 2;
-    d.y = height / 2;
-  });
+// This draws the physical circles on the screen
+const nodeElements = svg
+  .append("g")
+  .selectAll("circle")
+  .data(nodes)
+  .enter()
+  .append("circle")
+  .attr("r", radius)
+  .attr("fill", "#666")
+  .attr("stroke", "#ffffff") // Restores the white outline
+  .attr("stroke-width", 1.5); // Sets the thickness of the outline
 
-  const circles = svg
-    .selectAll("circle")
-    .data(nodes)
-    .enter()
-    .append("circle")
-    .attr("id", (d) => d.id)
-    .attr("r", radius)
-    .attr("fill", (d) => (d.gender === "M" ? COLOR_MALE : COLOR_FEMALE))
-    .attr("stroke", "#fff")
-    .attr("stroke-width", 2);
+// CRITICAL FIX 1: Create the invisible "labels" group!
+// Appended after the circles so the text naturally draws on top of the dots.
+svg.append("g").attr("id", "labels");
 
-  const labelGroup = svg.append("g").attr("id", "labels");
+// This makes the circles move mathematically
+simulation.on("tick", () => {
+  nodeElements.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+});
 
-  simulation = d3
-    .forceSimulation(nodes)
-    .force("charge", d3.forceManyBody().strength(-15))
-    .force(
-      "collide",
-      d3
-        .forceCollide()
-        .radius(radius + 2)
-        .iterations(4)
-    )
-    .on("tick", ticked);
-
-  function ticked() {
-    circles
-      .attr(
-        "cx",
-        (d) => (d.x = Math.max(radius, Math.min(width - radius, d.x)))
-      )
-      .attr(
-        "cy",
-        (d) => (d.y = Math.max(radius, Math.min(height - radius, d.y)))
-      );
-  }
-
-  const states = [
-    { name: "state_total", func: applyTotalForces },
-    { name: "state_age", func: applyAgeForces },
-    { name: "state_gender", func: applyGenderForces },
-    { name: "state_motivation", func: applyMotivationForces },
-    { name: "state_district", func: applyDistrictForces },
-    { name: "state_month", func: applyMonthForces }, // ADDED THIS LINE
-  ];
-
-  // Trigger for the specific text sections
-  states.forEach((state) => {
-    ScrollTrigger.create({
-      trigger: `.step[data-state='${state.name}']`,
-      start: "top center",
-      end: "bottom center", // Tells GSAP when the section is "over"
-      toggleClass: {
-        targets: `.step[data-state='${state.name}'] .content`,
-        className: "active",
-      }, // Fades text in and out
-      onEnter: state.func,
-      onEnterBack: state.func,
-    });
-  });
-
-  // NEW: Trigger to show the legend only when inside the D3 section
-  // FIXED: Tells the body when to reveal the active legend
-  ScrollTrigger.create({
-    trigger: ".d3-scrollytelling",
-    start: "top center",
-    end: "bottom top",
-    toggleClass: { targets: "body", className: "show-legends" },
-  });
-
-  applyTotalForces();
-}
+/* ========================================= */
+/* LABEL HELPER FUNCTIONS                    */
+/* ========================================= */
+/* LABEL HELPER FUNCTIONS                    */
+/* ========================================= */
 
 /* ========================================= */
 /* LABEL HELPER FUNCTIONS                    */
@@ -657,28 +614,38 @@ function clearLabels() {
   d3.select("#labels").selectAll("*").remove();
 }
 
-function addSvgLabel(text, x, y) {
+function addSvgLabel(text, x, y, size = "20px") {
   d3.select("#labels")
     .append("text")
     .attr("x", x)
     .attr("y", y)
     .attr("text-anchor", "middle")
-    // Crisp, native font size (from 14px to 22px for category names)
-    .style("font-size", isMobileView ? "22px" : "26px")
+    .style("font-size", isMobileView ? size : "26px")
     .style("font-weight", "bold")
     .style("fill", "#1a1a1a")
     .text(text);
 }
 
+/* ========================================= */
+/* TRUE RESPONSIVE D3 FORCE FUNCTIONS        */
+/* ========================================= */
+
 function applyTotalForces() {
   clearLabels();
   restoreGenderView();
-  // Central cluster positioned lower on the screen for balance
-  const yCenter = isMobileView ? height * 0.5 : height / 2;
-  addSvgLabel("60 Lives Lost", width / 2, yCenter + (isMobileView ? 160 : 200));
+
+  // MATCHING MOCKUP 1: Tighter cluster, bold label right below it
+  const yCenter = isMobileView ? height * 0.45 : height / 2;
+
+  if (isMobileView) {
+    addSvgLabel("60 Lives Lost", width / 2, yCenter + 150, "20px");
+  } else {
+    addSvgLabel("60 Lives Lost", width / 2, yCenter + 200, "26px");
+  }
+
   simulation
-    .force("x", d3.forceX(width / 2).strength(0.08))
-    .force("y", d3.forceY(yCenter).strength(0.08))
+    .force("x", d3.forceX(width / 2).strength(isMobileView ? 0.12 : 0.08))
+    .force("y", d3.forceY(yCenter).strength(isMobileView ? 0.12 : 0.08))
     .alpha(1)
     .restart();
 }
@@ -701,50 +668,97 @@ function applyAgeForces() {
   document.getElementById("d3-legend").classList.remove("active-legend");
   document.getElementById("d3-age-legend").classList.add("active-legend");
 
-  // DESKTOP uses X-axis (horizontal). MOBILE uses Y-axis (vertical waterfall!)
-  let ageScaleX = d3
-    .scaleLinear()
-    .domain([6, 68])
-    .range([width * 0.1, width * 0.9]);
-  let ageScaleY = d3
-    .scaleLinear()
-    .domain([6, 68])
-    .range([height * 0.25, height * 0.85]);
+  if (isMobileView) {
+    // MATCHING MOCKUP 2: Vertical Bar Chart / Histogram
+    const bins = [
+      { label: "0-10", max: 10 },
+      { label: "11-20", max: 20 },
+      { label: "21-30", max: 30 },
+      { label: "31-40", max: 40 },
+      { label: "41-50", max: 50 },
+      { label: "51-60", max: 60 },
+      { label: "61-70", max: 70 },
+    ];
 
-  simulation
-    .force(
-      "x",
-      d3
-        .forceX((d) => (isMobileView ? width / 2 : ageScaleX(d.age)))
-        .strength(0.15)
-    )
-    .force(
-      "y",
-      d3
-        .forceY((d) => (isMobileView ? ageScaleY(d.age) : height / 2))
-        .strength(isMobileView ? 0.15 : 0.05)
-    )
-    .alpha(1)
-    .restart();
+    // Mathematically sort and stack the dots into columns
+    let ageSorted = [...nodes].sort((a, b) => a.age - b.age);
+    let binCounts = [0, 0, 0, 0, 0, 0, 0];
+    ageSorted.forEach((n) => {
+      let bIndex = bins.findIndex((b) => n.age <= b.max);
+      if (bIndex === -1) bIndex = 6;
+      n.targetBin = bIndex;
+      n.stackPos = binCounts[bIndex]++;
+    });
+
+    const colW = width / 8;
+    const baseline = height * 0.7;
+    const dotSpacing = radius * 2.1;
+
+    bins.forEach((b, i) => {
+      let xPos = (i + 1) * colW;
+
+      // Rotated Bottom Labels
+      d3.select("#labels")
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", baseline + 30)
+        .attr("text-anchor", "end")
+        .attr("transform", `rotate(-90, ${xPos}, ${baseline + 30})`)
+        .style("font-size", "16px")
+        .style("fill", "#1a1a1a")
+        .text(b.label);
+
+      // Top Number Counts
+      let peakY = baseline - binCounts[i] * dotSpacing - 15;
+      d3.select("#labels")
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", peakY)
+        .attr("text-anchor", "middle")
+        .style("font-size", "18px")
+        .style("fill", "#1a1a1a")
+        .text(binCounts[i]);
+    });
+
+    // High strength forces to lock them exactly into bar chart columns
+    simulation
+      .force("x", d3.forceX((d) => (d.targetBin + 1) * colW).strength(1))
+      .force(
+        "y",
+        d3.forceY((d) => baseline - d.stackPos * dotSpacing).strength(1)
+      )
+      .alpha(1)
+      .restart();
+  } else {
+    let ageScaleX = d3
+      .scaleLinear()
+      .domain([6, 68])
+      .range([width * 0.1, width * 0.9]);
+    simulation
+      .force("x", d3.forceX((d) => ageScaleX(d.age)).strength(0.15))
+      .force("y", d3.forceY(height / 2).strength(0.05))
+      .alpha(1)
+      .restart();
+  }
 }
-
-/* ========================================= */
-/* TRUE RESPONSIVE D3 FORCE FUNCTIONS        */
-/* ========================================= */
 
 function applyGenderForces() {
   clearLabels();
   restoreGenderView();
 
-  // Desktop: Side-by-Side. Mobile: Top and Bottom Stack
   const xM = isMobileView ? width / 2 : width / 3;
   const xF = isMobileView ? width / 2 : (width / 3) * 2;
   const yM = isMobileView ? height * 0.35 : height / 2;
-  const yF = isMobileView ? height * 0.75 : height / 2;
+  const yF = isMobileView ? height * 0.7 : height / 2;
 
-  // Custom offsets so text is visible outside the clusters
-  addSvgLabel("Male (54)", xM, yM + (isMobileView ? 110 : 200));
-  addSvgLabel("Female (6)", xF, yF + (isMobileView ? 50 : 200));
+  // MATCHING MOCKUP 3: Exact formatting
+  if (isMobileView) {
+    addSvgLabel("Male 54", xM, yM + 140, "20px");
+    addSvgLabel("Female 06", xF, yF + 60, "20px");
+  } else {
+    addSvgLabel("Male (54)", xM, yM + 200);
+    addSvgLabel("Female (6)", xF, yF + 200);
+  }
 
   simulation
     .force("x", d3.forceX((d) => (d.gender === "M" ? xM : xF)).strength(0.1))
@@ -757,14 +771,21 @@ function applyMotivationForces() {
   clearLabels();
   restoreGenderView();
 
-  // Desktop: Side-by-Side. Mobile: Top and Bottom Stack
   const xC = isMobileView ? width / 2 : width / 3;
   const xP = isMobileView ? width / 2 : (width / 3) * 2;
   const yC = isMobileView ? height * 0.35 : height / 2;
-  const yP = isMobileView ? height * 0.75 : height / 2;
+  const yP = isMobileView ? height * 0.7 : height / 2;
 
-  addSvgLabel("Organised Crime (46)", xC, yC + (isMobileView ? 110 : 250));
-  addSvgLabel("Personal/Other (14)", xP, yP + (isMobileView ? 70 : 200));
+  // MATCHING MOCKUP 4: Custom multiline text splits
+  if (isMobileView) {
+    addSvgLabel("Organised crime 46", xC, yC + 130, "20px");
+    addSvgLabel("Personal", xP, yP + 70, "18px");
+    addSvgLabel("dispute/ Other", xP, yP + 95, "18px");
+    addSvgLabel("14", xP, yP + 120, "20px");
+  } else {
+    addSvgLabel("Organised Crime (46)", xC, yC + 250);
+    addSvgLabel("Personal/Other (14)", xP, yP + 200);
+  }
 
   simulation
     .force(
@@ -782,7 +803,8 @@ function applyMotivationForces() {
 function applyDistrictForces() {
   clearLabels();
   restoreGenderView();
-  const districts = [
+
+  const districtsDesktop = [
     "colombo",
     "galle",
     "hambantota",
@@ -799,85 +821,112 @@ function applyDistrictForces() {
     (d) => (districtCounts[d.district] = (districtCounts[d.district] || 0) + 1)
   );
 
-  const cols = isMobileView ? 3 : 5;
-  const colWidth = width / (cols + 1);
+  if (isMobileView) {
+    // MATCHING MOCKUP 5: Custom Grid Order (3, 3, 2, 2 pyramid)
+    const mobLoc = {
+      kurunegala: { row: 0, col: 0, maxCols: 3 },
+      ratnapura: { row: 0, col: 1, maxCols: 3 },
+      mannar: { row: 0, col: 2, maxCols: 3 },
+      puttalam: { row: 1, col: 0, maxCols: 3 },
+      kalutara: { row: 1, col: 1, maxCols: 3 },
+      matara: { row: 1, col: 2, maxCols: 3 },
+      gampaha: { row: 2, col: 0, maxCols: 2 },
+      hambantota: { row: 2, col: 1, maxCols: 2 },
+      galle: { row: 3, col: 0, maxCols: 2 },
+      colombo: { row: 3, col: 1, maxCols: 2 },
+    };
 
-  // SHIFTED UP: Grid now starts higher up to guarantee all 4 rows fit on screen
-  const rowHeight = isMobileView ? 115 : 0;
-  const dotBaseY = isMobileView ? height * 0.3 : height / 2 - 50;
-  const labelBaseY = isMobileView ? height * 0.3 + 45 : height / 2 + 180;
+    const yBase = height * 0.18;
+    const yGap = 160;
 
-  // Enlarged mobile labels and number badges
-  const labelSize = isMobileView ? "17px" : "22px";
-  const badgeR = isMobileView ? 15 : 18;
-  const badgeOffset = isMobileView ? 25 : 35;
-  const numSize = isMobileView ? "14px" : "16px";
+    Object.keys(mobLoc).forEach((dist) => {
+      let conf = mobLoc[dist];
+      let xPos = (conf.col + 1) * (width / (conf.maxCols + 1));
+      let yPos = yBase + conf.row * yGap;
 
-  districts.forEach((dist, i) => {
-    let xPos = isMobileView
-      ? ((i % cols) + 1) * colWidth
-      : d3
-          .scalePoint()
-          .domain(districts)
-          .range([width * 0.1, width * 0.9])(dist);
-    let yPos = isMobileView
-      ? Math.floor(i / cols) * rowHeight + labelBaseY
-      : labelBaseY;
+      // NO black badges, just clean text
+      d3.select("#labels")
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", yPos + 60)
+        .attr("text-anchor", "middle")
+        .style("font-size", "18px")
+        .style("fill", "#1a1a1a")
+        .text(dist.charAt(0).toUpperCase() + dist.slice(1));
+    });
 
-    const group = d3.select("#labels");
-    group
-      .append("text")
-      .attr("x", xPos)
-      .attr("y", yPos)
-      .attr("text-anchor", "middle")
-      .style("font-size", labelSize)
-      .style("font-weight", "bold")
-      .text(dist.charAt(0).toUpperCase() + dist.slice(1));
-    group
-      .append("circle")
-      .attr("cx", xPos)
-      .attr("cy", yPos + badgeOffset)
-      .attr("r", badgeR)
-      .style("fill", "#000");
-    group
-      .append("text")
-      .attr("x", xPos)
-      .attr("y", yPos + badgeOffset)
-      .attr("dy", "0.35em")
-      .attr("text-anchor", "middle")
-      .style("fill", "#fff")
-      .style("font-size", numSize)
-      .text(districtCounts[dist] || 0);
-  });
-
-  simulation
-    .force(
-      "x",
-      d3
-        .forceX((d) => {
-          const i = districts.indexOf(d.district);
-          return isMobileView
-            ? ((i % cols) + 1) * colWidth
-            : d3
-                .scalePoint()
-                .domain(districts)
-                .range([width * 0.1, width * 0.9])(d.district);
-        })
-        .strength(0.8)
-    )
-    .force(
-      "y",
-      d3
-        .forceY((d) => {
-          const i = districts.indexOf(d.district);
-          return isMobileView
-            ? Math.floor(i / cols) * rowHeight + dotBaseY
-            : dotBaseY;
-        })
-        .strength(0.8)
-    )
-    .alpha(1)
-    .restart();
+    simulation
+      .force(
+        "x",
+        d3
+          .forceX((d) => {
+            let conf = mobLoc[d.district];
+            return conf
+              ? (conf.col + 1) * (width / (conf.maxCols + 1))
+              : width / 2;
+          })
+          .strength(0.8)
+      )
+      .force(
+        "y",
+        d3
+          .forceY((d) => {
+            let conf = mobLoc[d.district];
+            return conf ? yBase + conf.row * yGap : height / 2;
+          })
+          .strength(0.8)
+      )
+      .alpha(1)
+      .restart();
+  } else {
+    // Desktop layout
+    districtsDesktop.forEach((dist, i) => {
+      let xPos = d3
+        .scalePoint()
+        .domain(districtsDesktop)
+        .range([width * 0.1, width * 0.9])(dist);
+      let yPos = height / 2 + 180;
+      const group = d3.select("#labels");
+      group
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", yPos)
+        .attr("text-anchor", "middle")
+        .style("font-size", "22px")
+        .style("font-weight", "bold")
+        .text(dist.charAt(0).toUpperCase() + dist.slice(1));
+      group
+        .append("circle")
+        .attr("cx", xPos)
+        .attr("cy", yPos + 35)
+        .attr("r", 18)
+        .style("fill", "#000");
+      group
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", yPos + 35)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "middle")
+        .style("fill", "#fff")
+        .style("font-size", "16px")
+        .text(districtCounts[dist] || 0);
+    });
+    simulation
+      .force(
+        "x",
+        d3
+          .forceX((d) =>
+            d3
+              .scalePoint()
+              .domain(districtsDesktop)
+              .range([width * 0.1, width * 0.9])(d.district)
+          )
+          .strength(0.8)
+      )
+      .force("y", d3.forceY(height / 2 - 50).strength(0.8))
+      .alpha(1)
+      .restart();
+  }
 }
 
 function applyMonthForces() {
@@ -918,44 +967,39 @@ function applyMonthForces() {
 
   const cols = isMobileView ? 3 : 6;
   const colWidth = width / (cols + 1);
-
-  // EXACT same layout logic applied here to guarantee fit for A Year of Loss
-  const rowHeight = isMobileView ? 115 : 350;
-  const dotBaseY = isMobileView ? height * 0.3 : 350;
-  const labelBaseY = isMobileView ? height * 0.3 + 45 : 490;
-
-  const labelSize = isMobileView ? "17px" : "22px";
-  const badgeR = isMobileView ? 15 : 18;
-  const badgeOffset = isMobileView ? 25 : 35;
-  const numSize = isMobileView ? "14px" : "16px";
+  const rowHeight = isMobileView ? 140 : 350;
+  const dotBaseY = isMobileView ? height * 0.22 : 350;
 
   months.forEach((month, i) => {
     const xPos = ((i % cols) + 1) * colWidth;
-    const yPos = Math.floor(i / cols) * rowHeight + labelBaseY;
+    // MATCHING MOCKUP 6: Kept the black badges here
+    const labelOffset = isMobileView ? 50 : 140;
+    const yPosLabel = dotBaseY + Math.floor(i / cols) * rowHeight + labelOffset;
 
     const group = d3.select("#labels");
     group
       .append("text")
       .attr("x", xPos)
-      .attr("y", yPos)
+      .attr("y", yPosLabel)
       .attr("text-anchor", "middle")
-      .style("font-size", labelSize)
+      .style("font-size", isMobileView ? "18px" : "22px")
       .style("font-weight", "bold")
+      .style("fill", "#1a1a1a")
       .text(shortMonths[i]);
     group
       .append("circle")
       .attr("cx", xPos)
-      .attr("cy", yPos + badgeOffset)
-      .attr("r", badgeR)
+      .attr("cy", yPosLabel + 25)
+      .attr("r", isMobileView ? 14 : 18)
       .style("fill", "#000");
     group
       .append("text")
       .attr("x", xPos)
-      .attr("y", yPos + badgeOffset)
+      .attr("y", yPosLabel + 25)
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
       .style("fill", "#fff")
-      .style("font-size", numSize)
+      .style("font-size", isMobileView ? "14px" : "16px")
       .text(monthCounts[month] || 0);
   });
 
@@ -995,22 +1039,37 @@ gsap.utils.toArray(".step").forEach((step) => {
   ScrollTrigger.create({
     trigger: step,
     start: "top center", // Triggers when the text hits the middle
-    onEnter: () => toggleLegends(step),
-    onEnterBack: () => toggleLegends(step), // Handles scrolling upwards
+    onEnter: () => handleStepEnter(step),
+    onEnterBack: () => handleStepEnter(step), // Handles scrolling upwards
   });
 });
 
-// 3. The logic: Only show Age legend if on the Age step!
-function toggleLegends(step) {
-  // Check if the current step is the Age section
-  if (
-    step.id === "age-step" ||
-    step.getAttribute("data-state") === "state_age"
-  ) {
+// 3. The Master Controller: Fires animations AND legends
+function handleStepEnter(step) {
+  const state = step.getAttribute("data-state");
+
+  // CRITICAL FIX 2: Fade the HTML text in and out as you scroll!
+  document
+    .querySelectorAll(".step .content")
+    .forEach((el) => el.classList.remove("active"));
+  const currentContent = step.querySelector(".content");
+  if (currentContent) {
+    currentContent.classList.add("active");
+  }
+
+  // A. Fire the correct D3 physics layout based on the text section
+  if (state === "state_total") applyTotalForces();
+  else if (state === "state_age") applyAgeForces();
+  else if (state === "state_gender") applyGenderForces();
+  else if (state === "state_motivation") applyMotivationForces();
+  else if (state === "state_district") applyDistrictForces();
+  else if (state === "state_month") applyMonthForces();
+
+  // B. Toggle the legends based on the current step
+  if (state === "state_age" || step.id === "age-step") {
     document.getElementById("d3-legend").classList.remove("active-legend");
     document.getElementById("d3-age-legend").classList.add("active-legend");
   } else {
-    // For every other section (Total, Gender, Motives, etc.), show Male/Female
     document.getElementById("d3-age-legend").classList.remove("active-legend");
     document.getElementById("d3-legend").classList.add("active-legend");
   }
