@@ -820,14 +820,15 @@ function applyDistrictForces() {
   if (isMobileView) {
     // MOBILE VIEW: 3-Column Centered Grid
     const cols = 3;
-    const rowHeight = 150; // Exact pixel spacing to prevent overlap
-    const dotBaseY = 200; // Pushed down safely below the header
+    // MASSIVE FIX: Increased rowHeight and dotBaseY to prevent large clusters from overlapping
+    const rowHeight = 170;
+    const dotBaseY = 160;
 
     districtsDesktop.forEach((dist, i) => {
       const row = Math.floor(i / cols);
       const col = i % cols;
 
-      // Magic math: Automatically centers the bottom rows if they have 1 or 2 items!
+      // Automatically centers the bottom rows if they have fewer than 3 items
       const itemsInThisRow = Math.min(
         cols,
         districtsDesktop.length - row * cols
@@ -835,7 +836,8 @@ function applyDistrictForces() {
       const dynamicColWidth = width / (itemsInThisRow + 1);
       const xPos = (col + 1) * dynamicColWidth;
 
-      const yPosLabel = dotBaseY + row * rowHeight + 55;
+      // Pushed label 75px down to safely clear the massive 18-dot Colombo cluster
+      const yPosLabel = dotBaseY + row * rowHeight + 75;
 
       const group = d3.select("#labels");
 
@@ -854,7 +856,7 @@ function applyDistrictForces() {
       group
         .append("circle")
         .attr("cx", xPos)
-        .attr("cy", yPosLabel + 22)
+        .attr("cy", yPosLabel + 25)
         .attr("r", 14)
         .style("fill", "#000");
 
@@ -862,7 +864,7 @@ function applyDistrictForces() {
       group
         .append("text")
         .attr("x", xPos)
-        .attr("y", yPosLabel + 22)
+        .attr("y", yPosLabel + 25)
         .attr("dy", "0.35em")
         .attr("text-anchor", "middle")
         .style("fill", "#fff")
