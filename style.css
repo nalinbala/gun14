@@ -1,0 +1,911 @@
+/* --- GLOBAL STYLES --- */
+/* --- GLOBAL STYLES --- */
+/* --- GLOBAL STYLES --- */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  max-width: 100%; /* Strictly enforces the boundary */
+  overflow-x: hidden; /* Hides anything pushing past the edge */
+  background-color: #f8f9fa;
+  font-family: "Roboto", sans-serif;
+}
+
+/* ========================================= */
+/* MASTHEAD NAVIGATION                       */
+/* ========================================= */
+.masthead {
+  background-color: #0065ad; /* Sunday Times Brand Blue */
+  height: 60px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999; /* Ensures it sits above all D3 and GSAP layers */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+}
+
+/* Prevents the fixed header from causing issues when mobile devices are turned sideways */
+@media (max-width: 950px) and (orientation: landscape) {
+  .masthead {
+    position: absolute !important;
+    top: 0;
+  }
+}
+
+.masthead-inner {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.masthead-left img,
+.masthead-right img {
+  height: 35px;
+  width: auto;
+  display: block;
+}
+
+.hub-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Default to showing the full logo */
+.logo-full {
+  display: block !important;
+}
+.logo-mobile {
+  display: none !important;
+}
+
+/* Responsive Logo Swapping for Mobile Screens */
+@media (max-width: 600px) {
+  .logo-full {
+    display: none !important;
+  }
+  .logo-mobile {
+    display: block !important;
+  }
+  .masthead-inner {
+    padding: 0 15px;
+  }
+}
+
+/* GLOBAL AI2HTML SETUP - Paste this once */
+.ai2html,
+.ai2html .g-artboard {
+  margin: 0 auto;
+}
+.ai2html p {
+  margin: 0;
+}
+.ai2html .g-aiAbs {
+  position: absolute;
+}
+.ai2html .g-aiImg {
+  position: absolute;
+  top: 0;
+  display: block;
+  width: 100% !important;
+}
+.ai2html .g-aiSymbol {
+  position: absolute;
+  box-sizing: border-box;
+}
+.ai2html .g-aiPointText p {
+  white-space: nowrap;
+}
+
+/* Force your editorial font and background color */
+.ai2html p {
+  font-family: "Source Sans Pro", sans-serif !important;
+}
+[id^="g-"] {
+  background-color: #f8f9fa !important;
+}
+
+/* --- THE FIXED D3 STAGE --- */
+#visual-stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  background-color: transparent; /* Lets the body background show through */
+}
+
+/* --- PART 1: INTRO WRAPPER (DARK MODE) --- */
+.intro-wrapper {
+  position: relative;
+  background-color: black;
+  z-index: 10;
+}
+
+/* The Cinematic Sticky Shadows */
+.viewport-fade {
+  position: sticky;
+  left: 0;
+  width: 100%;
+  height: 15vh;
+  z-index: 50;
+  pointer-events: none;
+}
+.top-fade {
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 20%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+.bottom-fade {
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 20%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  margin-top: -15vh; /* Prevents the sticky div from pushing content down */
+}
+
+.scrollytelling-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+/* Intro Typography */
+.main-heading {
+  text-align: center;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin: 0;
+  padding: 0 20px;
+}
+
+.title-main {
+  color: #ffffff;
+  font-family: "Merriweather", serif;
+  font-size: 80px;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.1;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+.title-sub {
+  color: #a0a0a0;
+  font-size: 26px;
+  font-weight: 300;
+  margin: 0;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.names-text {
+  color: #817f7f;
+  font-family: "Merriweather", serif;
+  font-size: 48px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.4;
+  margin: 0 auto;
+  max-width: 1400px;
+  padding: 0 40px;
+  margin-top: 50vh;
+  overflow-wrap: break-word; /* Allows long names to break if they exceed screen width */
+}
+
+.bridge-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 20vh;
+  padding-bottom: 40vh;
+}
+
+.bridge-paragraph {
+  color: #ffffff;
+  font-family: "Merriweather", serif;
+  font-size: 28px;
+  line-height: 1.8;
+  text-align: center;
+  max-width: 900px;
+  font-weight: 300;
+}
+
+/* --- PART 2: GSAP CANVAS TRANSITION --- */
+.intro-sequence {
+  height: 100vh;
+  width: 100%;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 100; /* Pulls it above the intro shadows */
+}
+
+/* REPLACE YOUR CURRENT CANVAS CSS WITH THIS: */
+#shooting-canvas {
+  width: 100%; /* Changed from 100vw to 100% to fix double scrollbar */
+  height: 100vh;
+  object-fit: cover;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* --- PART 3: D3 STATISTICS SECTIONS --- */
+main.d3-scrollytelling {
+  position: relative;
+  z-index: 10;
+}
+
+/* ========================================= */
+/* D3 LEGEND STYLING & MASTER SWITCH         */
+/* ========================================= */
+
+/* 1. Both legends start completely hidden by default */
+#d3-legend,
+#d3-age-legend {
+  position: fixed;
+  top: 85px;
+  right: 5vw;
+  z-index: 20;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#d3-legend {
+  display: flex;
+  gap: 20px;
+}
+
+#d3-age-legend {
+  width: 250px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  color: #4a4a4a;
+}
+.legend-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+.legend-dot.female {
+  background-color: #ee6c4d;
+}
+.legend-dot.male {
+  background-color: #3e5c76;
+}
+
+.age-guide-title {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  color: #4a4a4a;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.age-gradient-bar {
+  height: 15px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    #1e6b3c 0%,
+    #4cb050 9%,
+    #ffeb3b 18%,
+    #ff9800 36%,
+    #f44336 58%,
+    #b71c1c 80%,
+    #880e4f 100%
+  );
+}
+
+.age-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  color: #1a1a1a;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* 2. MASTER VISIBILITY SWITCH: 
+   Legends ONLY appear when GSAP adds "show-legends" to the body, 
+   AND the script has marked one as "active-legend".
+*/
+body.show-legends #d3-legend.active-legend,
+body.show-legends #d3-age-legend.active-legend {
+  opacity: 1;
+  visibility: visible;
+}
+/* --- UPDATED: TEXT STEPS --- */
+.step {
+  height: 100vh; /* Acts purely as an invisible scroll area now */
+}
+
+.content {
+  position: fixed;
+  top: 16vh; /* Changed from 12vh */
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  max-width: 800px;
+  opacity: 0; /* Hidden by default */
+  visibility: hidden;
+  z-index: 15;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+  pointer-events: none; /* Prevents text from blocking clicks */
+}
+
+/* GSAP will add this class to fade the text in */
+.content.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.content h1,
+.content h2 {
+  font-size: 2rem;
+  font-family: "Source Sans Pro", sans-serif;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-top: 0;
+  margin-bottom: 5px; /* ADD THIS: Pulls the paragraph closer */
+}
+
+.content p {
+  color: #4a4a4a;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-top: 0; /* ADD THIS: Removes default top spacing */
+}
+
+.spacer {
+  height: 50vh;
+}
+
+/* --- AI2HTML: Annual --- */
+
+#g-annual-330 {
+  position: relative;
+  overflow: hidden;
+}
+#g-annual-330 p {
+  font-family: arial, helvetica, sans-serif;
+  line-height: 37px;
+  opacity: 1;
+  letter-spacing: 0em;
+  font-size: 14px;
+  text-align: left;
+  color: rgb(0, 0, 0);
+  text-transform: none;
+  padding-bottom: 0;
+  padding-top: 0;
+  mix-blend-mode: normal;
+  font-style: normal;
+  height: auto;
+  position: static;
+}
+#g-annual-330 .g-pstyle0 {
+  font-weight: bold;
+  height: 37px;
+  font-size: 17px;
+  text-align: right;
+}
+
+/* --- AI2HTML: Gender --- */
+
+#g-gender-360 {
+  position: relative;
+  overflow: hidden;
+}
+#g-gender-360 p {
+  font-family: arial, helvetica, sans-serif;
+  line-height: 19px;
+  height: auto;
+  opacity: 1;
+  letter-spacing: 0em;
+  font-size: 17px;
+  text-align: left;
+  color: rgb(0, 0, 0);
+  text-transform: none;
+  padding-bottom: 0;
+  padding-top: 0;
+  mix-blend-mode: normal;
+  font-style: normal;
+  position: static;
+}
+#g-gender-360 .g-pstyle0 {
+  height: 19px;
+  text-align: right;
+}
+#g-gender-360 .g-pstyle1 {
+  font-weight: bold;
+  height: 19px;
+  text-align: right;
+}
+#g-gender-360 .g-pstyle2 {
+  height: 19px;
+}
+#g-gender-360 .g-pstyle3 {
+  font-weight: bold;
+  height: 19px;
+}
+
+/* --- AI2HTML: Age --- */
+
+#g-age-360 {
+  position: relative;
+  overflow: hidden;
+}
+#g-age-360 p {
+  font-family: arial, helvetica, sans-serif;
+  line-height: 14px;
+  height: auto;
+  opacity: 1;
+  letter-spacing: 0em;
+  font-size: 12px;
+  text-align: left;
+  color: rgb(0, 0, 0);
+  text-transform: none;
+  padding-bottom: 0;
+  padding-top: 0;
+  mix-blend-mode: normal;
+  font-style: normal;
+  position: static;
+}
+#g-age-360 .g-pstyle0 {
+  line-height: 37px;
+  height: 37px;
+  font-size: 14px;
+  text-align: right;
+}
+#g-age-360 .g-pstyle1 {
+  font-weight: bold;
+  line-height: 17px;
+  height: 17px;
+  font-size: 14px;
+  text-align: center;
+}
+#g-age-360 .g-pstyle2 {
+  height: 14px;
+  text-align: right;
+}
+
+/* --- AI2HTML: Monthly --- */
+
+#g-monthly-330 {
+  position: relative;
+  overflow: hidden;
+}
+#g-monthly-330 p {
+  font-family: arial, helvetica, sans-serif;
+  line-height: 27px;
+  opacity: 1;
+  letter-spacing: 0em;
+  font-size: 16px;
+  text-align: left;
+  color: rgb(0, 0, 0);
+  text-transform: none;
+  padding-bottom: 0;
+  padding-top: 0;
+  mix-blend-mode: normal;
+  font-style: normal;
+  height: auto;
+  position: static;
+}
+#g-monthly-330 .g-pstyle0 {
+  font-weight: bold;
+  line-height: 21px;
+  height: 21px;
+  font-size: 18px;
+  text-align: right;
+}
+#g-monthly-330 .g-pstyle1 {
+  text-align: right;
+}
+
+/* --- AI2HTML: Guns --- */
+
+#g-guns-330 {
+  position: relative;
+  overflow: hidden;
+}
+#g-guns-330 p {
+  font-family: arial, helvetica, sans-serif;
+  font-style: normal;
+  line-height: 14px;
+  opacity: 1;
+  letter-spacing: 0em;
+  font-size: 12px;
+  text-align: left;
+  color: rgb(0, 0, 0);
+  text-transform: none;
+  padding-bottom: 0;
+  padding-top: 0;
+  mix-blend-mode: normal;
+  height: auto;
+  position: static;
+}
+#g-guns-330 .g-pstyle0 {
+  text-align: right;
+}
+#g-guns-330 .g-pstyle1 {
+  font-style: italic;
+  text-align: right;
+}
+#g-guns-330 .g-pstyle2 {
+  line-height: 17px;
+  text-align: center;
+}
+#g-guns-330 .g-pstyle3 {
+  font-weight: bold;
+  line-height: 23px;
+  font-size: 22px;
+  text-align: center;
+}
+#g-guns-330 .g-pstyle4 {
+  font-weight: bold;
+  line-height: 26px;
+  height: 26px;
+  font-size: 22px;
+}
+#g-guns-330 .g-pstyle5 {
+  font-weight: bold;
+  line-height: 26px;
+  height: 26px;
+  font-size: 22px;
+  text-align: right;
+}
+#g-guns-330 .g-pstyle6 {
+  font-weight: bold;
+  line-height: 26px;
+  font-size: 22px;
+  text-align: center;
+}
+#g-guns-330 .g-pstyle7 {
+  text-align: center;
+}
+#g-guns-330 .g-pstyle8 {
+  font-style: italic;
+  text-align: center;
+}
+#g-guns-330 .g-cstyle0 {
+  font-weight: 500;
+  font-size: 15px;
+}
+#g-guns-550 {
+  position: relative;
+  overflow: hidden;
+}
+#g-guns-550 p {
+  font-family: arial, helvetica, sans-serif;
+  line-height: 17px;
+  opacity: 1;
+  letter-spacing: 0em;
+  font-size: 14px;
+  text-align: left;
+  color: rgb(0, 0, 0);
+  text-transform: none;
+  padding-bottom: 0;
+  padding-top: 0;
+  mix-blend-mode: normal;
+  font-style: normal;
+  height: auto;
+  position: static;
+}
+#g-guns-550 .g-pstyle0 {
+  font-weight: bold;
+  line-height: 26px;
+  height: 26px;
+  font-size: 30px;
+}
+#g-guns-550 .g-pstyle1 {
+  text-align: center;
+}
+#g-guns-550 .g-pstyle2 {
+  font-weight: bold;
+  line-height: 27px;
+  font-size: 30px;
+  text-align: center;
+}
+#g-guns-550 .g-pstyle3 {
+  font-style: italic;
+}
+#g-guns-550 .g-pstyle4 {
+  text-align: right;
+}
+#g-guns-550 .g-pstyle5 {
+  font-weight: bold;
+  line-height: 26px;
+  height: 26px;
+  font-size: 30px;
+  text-align: right;
+}
+#g-guns-550 .g-pstyle6 {
+  font-weight: bold;
+  line-height: 29px;
+  font-size: 30px;
+  text-align: center;
+}
+#g-guns-550 .g-pstyle7 {
+  font-weight: 500;
+  font-size: 15px;
+  text-align: center;
+}
+#g-guns-550 .g-pstyle8 {
+  font-weight: 500;
+  font-style: italic;
+  font-size: 15px;
+  text-align: center;
+}
+#g-guns-550 .g-pstyle9 {
+  font-weight: bold;
+  line-height: 26px;
+  font-size: 30px;
+  text-align: center;
+}
+#g-guns-550 .g-pstyle10 {
+  line-height: 16px;
+  text-align: right;
+}
+#g-guns-550 .g-pstyle11 {
+  font-style: italic;
+  line-height: 16px;
+  text-align: right;
+}
+#g-guns-550 .g-cstyle0 {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+/* --- AI2HTML: Districts --- */
+#g-districts-330 {
+  position: relative;
+  overflow: hidden;
+}
+#g-districts-330 p {
+  font-family: arial, helvetica, sans-serif;
+  line-height: 27px;
+  opacity: 1;
+  letter-spacing: 0em;
+  font-size: 16px;
+  text-align: left;
+  color: rgb(0, 0, 0);
+  text-transform: none;
+  padding-bottom: 0;
+  padding-top: 0;
+  mix-blend-mode: normal;
+  font-style: normal;
+  height: auto;
+  position: static;
+}
+#g-districts-330 .g-pstyle0 {
+  text-align: right;
+}
+#g-districts-330 .g-pstyle1 {
+  font-weight: bold;
+  line-height: 21px;
+  height: 21px;
+  font-size: 18px;
+  text-align: right;
+}
+#g-districts-330 .g-pstyle2 {
+  line-height: 18px;
+  height: 18px;
+  font-size: 15px;
+  text-align: right;
+}
+
+/* --- AI2HTML: Locations --- */
+
+#g-locations-550 {
+  position: relative;
+  overflow: hidden;
+}
+#g-locations-550 p {
+  font-family: arial, helvetica, sans-serif;
+  line-height: 17px;
+  height: auto;
+  opacity: 1;
+  letter-spacing: 0em;
+  font-size: 14px;
+  text-align: left;
+  color: rgb(0, 0, 0);
+  text-transform: none;
+  padding-bottom: 0;
+  padding-top: 0;
+  mix-blend-mode: normal;
+  font-style: normal;
+  position: static;
+}
+#g-locations-550 .g-pstyle0 {
+  height: 17px;
+  text-align: right;
+}
+#g-locations-550 .g-pstyle1 {
+  height: 17px;
+}
+#g-locations-330 {
+  position: relative;
+  overflow: hidden;
+}
+#g-locations-330 p {
+  font-family: arial, helvetica, sans-serif;
+  line-height: 13px;
+  height: auto;
+  opacity: 1;
+  letter-spacing: 0em;
+  font-size: 11px;
+  text-align: left;
+  color: rgb(0, 0, 0);
+  text-transform: none;
+  padding-bottom: 0;
+  padding-top: 0;
+  mix-blend-mode: normal;
+  font-style: normal;
+  position: static;
+}
+#g-locations-330 .g-pstyle0 {
+  height: 13px;
+  text-align: right;
+}
+#g-locations-330 .g-pstyle1 {
+  height: 13px;
+}
+
+/* --- AI2HTML: Motives --- */
+
+#g-motives-330 {
+  position: relative;
+  overflow: hidden;
+}
+#g-motives-330 p {
+  font-family: arial, helvetica, sans-serif;
+  line-height: 17px;
+  opacity: 1;
+  letter-spacing: 0em;
+  font-size: 13px;
+  text-align: left;
+  color: rgb(0, 0, 0);
+  text-transform: none;
+  padding-bottom: 0;
+  padding-top: 0;
+  mix-blend-mode: normal;
+  font-style: normal;
+  height: auto;
+  position: static;
+}
+#g-motives-330 .g-pstyle0 {
+  text-align: center;
+}
+#g-motives-330 .g-pstyle1 {
+  font-weight: bold;
+  line-height: 25px;
+  font-size: 24px;
+  text-align: center;
+}
+
+/* ========================================= */
+/* STATIC ANALYSIS SECTION FIXES             */
+/* ========================================= */
+
+/* 1. Fix the Overlap: Forces this section to sit ON TOP of the D3 canvas */
+.static-analysis-section {
+  position: relative;
+  z-index: 20; /* This must be higher than the #visual-stage z-index */
+  background-color: #f8f9fa; /* Gives it a solid background to hide the dots */
+  width: 100%;
+}
+
+/* 2. Fix the Width: Centers your text and headings at 550px */
+.text-container {
+  max-width: 550px;
+  margin: 0 auto; /* Centers the block on the screen */
+  padding: 0 20px;
+}
+
+/* 3. Fix the AI2HTML Width: Centers your graphics at 550px */
+/* 3. Fix the AI2HTML Width: Centers your graphics at 550px */
+.media-container {
+  max-width: 550px;
+  margin: 0 auto;
+  padding: 0 20px;
+  /* Removed display: flex; so the smaller charts stop collapsing to 0px */
+}
+
+/* Ensure the AI2HTML boxes expand properly */
+.ai2html {
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* FORCE TRANSPARENCY ON AI2HTML CONTAINERS */
+.ai2html,
+.g-artboard,
+div[id^="g-"] {
+  background-color: transparent !important;
+}
+
+/* ========================================= */
+/* FINAL AI2HTML TWEAKS & OVERRIDES          */
+/* ========================================= */
+
+/* Fix 1: Remove white backgrounds from behind text */
+.ai2html p,
+.ai2html .g-aiPointText p {
+  background-color: transparent !important;
+}
+
+/* Fix 2: Stop text from being chopped off at the bottom */
+.ai2html .g-artboard {
+  overflow: visible !important;
+}
+
+/* ========================================= */
+/* MOBILE RESPONSIVENESS MASTER BLOCK        */
+/* ========================================= */
+@media (max-width: 768px) {
+  /* Scale down D3 labels for the mobile grid */
+  #labels text {
+    font-size: 24px !important; /* Larger for 1920x1080 canvas scale */
+  }
+  #labels circle {
+    r: 25px !important;
+  }
+  /* 1. Bypass the complex D3 animations on mobile */
+
+  /* 2. Reduce the massive gap between the intro and static section */
+  .bridge-section {
+    padding-bottom: 10vh;
+  }
+
+  /* 3. Shrink the massive desktop text to fit phone screens */
+  .names-text {
+    font-size: 26px;
+    padding: 0 15px;
+  }
+
+  .title-main {
+    font-size: 45px;
+  }
+
+  /* 4. Make the bridge paragraph elegant on mobile */
+  .bridge-paragraph {
+    font-size: 20px;
+    line-height: 1.5;
+    padding: 0 25px;
+  }
+}

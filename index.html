@@ -1,0 +1,1996 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gun Violence in 2025 - In Memoriam & Analysis</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Merriweather:wght@300;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  </head>
+  <body>
+    <nav class="masthead">
+      <div class="masthead-inner">
+        <div class="masthead-left">
+          <a
+            href="https://nalinbala.github.io/showcase/"
+            class="hub-link"
+            aria-label="Return to Infographics Hub"
+          >
+            <img
+              src="assets/logos/st-logo-full.svg"
+              alt="Sunday Times"
+              class="logo-full"
+            />
+            <img
+              src="assets/logos/st-logo-mobile.svg"
+              alt="ST"
+              class="logo-mobile"
+            />
+          </a>
+        </div>
+
+        <div class="masthead-right">
+          <a
+            href="https://nalinbala.github.io/showcase/"
+            class="hub-link"
+            aria-label="Return to Infographics Hub"
+          >
+            <img src="assets/logos/infographics-logo.svg" alt="Infographics" />
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="intro-wrapper">
+      <div class="viewport-fade top-fade"></div>
+
+      <div class="scrollytelling-content">
+        <header class="main-heading">
+          <h1 class="title-main">Gun Violence in 2025</h1>
+          <h2 class="title-sub">Numbers and Patterns</h2>
+        </header>
+
+        <p class="names-text">
+          Akash Tharuka (26), Sudath Gomes (36), Chanaka Vimukthi (20),
+          Saveriyan Arul (61), Selvakumar Jude (42), Savindu Tharindu (24),
+          Indunil Saman Kumara (55), Chathuranga Kumara (34) M. Neville ( ),
+          Jagath Ravindra Samarasinghe (35), Kenistan Nato (44), Aruna
+          Vidanagamage (39), Sanjeewa Kumara Samararathne (43), Ayoshanta
+          Bopayaarachchi (40), Shashi Kumar (38), Inulima Nethmi Banneheka (9),
+          Siridath Dhammika (61), Thirimadura Nishantha Mendis (45), Pasindu
+          Tharaka (29), Yomesh Nadeeshan (28), Dan Priyasad (39), Kasun
+          Harischandra (35), Mahadura Nalin Wasantha (52), Nissanka Peiris (19),
+          Chamal Abeykoon (40 ), Kalum Tushara (26 ), Iranta Suranjana (22),
+          Upali Kulawardhana (50), Ratnayake Mudiyanselage Upul Amarajith
+          Ratnayake (45), Chaturani (Sandamali) (30), Arun Mendis (23),
+          Dissanayake Mudiyanselage Nimesh Kalum Kumara (23), Suresh Madushan
+          (23), Shantha Mudunkotuwa (46), Ayyappan Prabhu (45), Lalith Kumara
+          Kodagoda (57), Gihan Dulan Perera (21), Dhanushka Udaya Shanta (35),
+          Heshan Salinda Pushpakumara (26), Padmasiri Gardiyawasam (58), Pasindu
+          Heshan (28), Imesha Madhubashni (28), Lasantha Wickramasekara (38),
+          Mirantha Varushavithana (54), Balachandran Pushparaj (43), Roshika
+          Shamen (48), J.H. Wijath (68), H. Pushpa (58), Aminda Pradeep (34),
+          Shriran Kosala de Silva (47), Chandima Sachintha Perera (26)
+        </p>
+
+        <div class="bridge-section">
+          <p class="bridge-paragraph">
+            These are the names of fifty-three individuals, out of sixty, whose
+            lives were taken by gunfire last year. They are not just statistics;
+            behind each name on this list is a human story, abruptly ended by a
+            bullet.
+          </p>
+        </div>
+      </div>
+
+      <div class="viewport-fade bottom-fade"></div>
+    </div>
+
+    <section class="intro-sequence">
+      <canvas id="shooting-canvas"></canvas>
+    </section>
+
+    <svg id="visual-stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet"></svg>
+
+    <div id="d3-legend">
+      <div class="legend-item">
+        <span class="legend-dot female"></span> Female
+      </div>
+      <div class="legend-item"><span class="legend-dot male"></span> Male</div>
+    </div>
+
+    <div id="d3-age-legend">
+      <div class="age-guide-title">Color guide for Age</div>
+      <div class="age-gradient-bar"></div>
+      <div class="age-labels">
+        <span>6</span>
+        <span>12</span>
+        <span>18</span>
+        <span>30</span>
+        <span>45</span>
+        <span>60</span>
+        <span>68</span>
+      </div>
+    </div>
+
+    <main class="d3-scrollytelling">
+      <section class="step" data-state="state_total">
+        <div class="content">
+          <h1>60 Lives Lost</h1>
+          <p>A visual analysis of shooting incidents in 2025.</p>
+        </div>
+      </section>
+
+      <section class="step" data-state="state_age" id="age-step">
+        <div class="content">
+          <h2>Age Breakdown</h2>
+          <p>From a 6-year-old child to a 68-year-old adult.</p>
+        </div>
+      </section>
+
+      <section class="step" data-state="state_gender">
+        <div class="content">
+          <h2>Gender Split</h2>
+          <p>90% Male, 10% Female.</p>
+        </div>
+      </section>
+
+      <section class="step" data-state="state_motivation">
+        <div class="content">
+          <h2>The Motivation</h2>
+          <p>Organized crime drives the violence.</p>
+        </div>
+      </section>
+
+      <section class="step" data-state="state_district">
+        <div class="content">
+          <h2>Location</h2>
+          <p>Colombo remains the epicenter.</p>
+        </div>
+      </section>
+
+      <section class="step" data-state="state_month">
+        <div class="content">
+          <h2>A Year of Loss</h2>
+          <p>
+            Analyzing the timeline reveals stark spikes in violence during
+            January and February.
+          </p>
+        </div>
+      </section>
+
+      <section class="spacer"></section>
+    </main>
+
+    <section
+      class="static-analysis-section"
+      style="padding: 10vh 0; background-color: #f8f9fa"
+    >
+      <div class="data-block" style="margin-bottom: 60px">
+        <div class="text-container">
+          <h3
+            style="
+              font-family: 'Source Sans Pro', sans-serif;
+              font-weight: 700;
+              color: #1a1a1a;
+              margin-bottom: 20px;
+            "
+          >
+            Annual deaths from shootings
+          </h3>
+        </div>
+
+        <div class="media-container" style="text-align: center">
+          <div id="g-annual-box" class="ai2html">
+            <!-- Artboard: 330 -->
+            <div
+              id="g-annual-330"
+              class="g-artboard"
+              style="max-width: 322px; max-height: 131px"
+              data-aspect-ratio="2.462"
+            >
+              <div style="padding: 0 0 40.6197% 0"></div>
+              <img
+                id="g-annual-330-img"
+                class="g-annual-img g-aiImg"
+                alt=""
+                src="assets/AIHTML/annual-330.png"
+              />
+              <div
+                id="g-ai0-1"
+                class="g-Layer_1 g-aiAbs"
+                style="top: -7.6455%; left: 0%; width: 9.9379%"
+              >
+                <p>2023</p>
+                <p>2024</p>
+                <p>2025</p>
+                <p>2026</p>
+              </div>
+              <div
+                id="g-ai0-2"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 10.3295%;
+                  margin-top: -20.5px;
+                  right: 9.4996%;
+                  width: 41px;
+                "
+              >
+                <p class="g-pstyle0">54</p>
+              </div>
+              <div
+                id="g-ai0-3"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 36.3243%;
+                  margin-top: -20.5px;
+                  right: -0.0136%;
+                  width: 41px;
+                "
+              >
+                <p class="g-pstyle0">61</p>
+              </div>
+              <div
+                id="g-ai0-4"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 64.6127%;
+                  margin-top: -20.5px;
+                  right: 1.1661%;
+                  width: 41px;
+                "
+              >
+                <p class="g-pstyle0">60</p>
+              </div>
+              <div
+                id="g-ai0-5"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 92.1366%;
+                  margin-top: -20.5px;
+                  right: 68.4789%;
+                  width: 41px;
+                "
+              >
+                <p class="g-pstyle0">10</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-container" style="margin-top: 15px">
+          <p style="color: #4a4a4a; font-size: 1.1rem; line-height: 1.6">
+            Data from the last four years shows that 2024 had the highest number
+            of shooting deaths, totaling 61.
+          </p>
+        </div>
+      </div>
+
+      <div class="data-block" style="margin-bottom: 60px">
+        <div class="text-container">
+          <h3
+            style="
+              font-family: 'Source Sans Pro', sans-serif;
+              font-weight: 700;
+              color: #1a1a1a;
+              margin-bottom: 20px;
+            "
+          >
+            Shooting Deaths by Gender - 2025
+          </h3>
+        </div>
+
+        <div class="media-container" style="text-align: center">
+          <div id="g-gender-box" class="ai2html">
+            <!-- Artboard: 360 -->
+            <div
+              id="g-gender-360"
+              class="g-artboard"
+              style="max-width: 207px; max-height: 246px"
+              data-aspect-ratio="0.842"
+            >
+              <div style="padding: 0 0 118.8012% 0"></div>
+              <img
+                id="g-gender-360-img"
+                class="g-gender-img g-aiImg"
+                alt=""
+                src="assets/AIHTML/gender-360.png"
+              />
+              <div
+                id="g-ai0-1"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 8.1305%;
+                  margin-top: -21px;
+                  right: 72.4638%;
+                  width: 79px;
+                "
+              >
+                <p class="g-pstyle0">Female</p>
+                <p class="g-pstyle1">10%</p>
+              </div>
+              <div
+                id="g-ai0-2"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 13.4168%;
+                  margin-top: -21px;
+                  left: 78.288%;
+                  width: 59px;
+                "
+              >
+                <p class="g-pstyle2">Male</p>
+                <p class="g-pstyle3">90%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-container" style="margin-top: 15px">
+          <p style="color: #4a4a4a; font-size: 1.1rem; line-height: 1.6">
+            Gun violence in 2025 was heavily gendered: 90% of victims were male
+            (54 out of 60). Among the six female victims, two were children
+            younger than ten.
+          </p>
+        </div>
+      </div>
+
+      <div class="data-block" style="margin-bottom: 60px">
+        <div class="text-container">
+          <h3
+            style="
+              font-family: 'Source Sans Pro', sans-serif;
+              font-weight: 700;
+              color: #1a1a1a;
+              margin-bottom: 20px;
+            "
+          >
+            Age Breakdown of Shooting Deaths - 2025
+          </h3>
+        </div>
+
+        <div class="media-container" style="text-align: center">
+          <div id="g-age-box" class="ai2html">
+            <!-- Artboard: 360 -->
+            <div
+              id="g-age-360"
+              class="g-artboard"
+              style="max-width: 315px; max-height: 297px"
+              data-aspect-ratio="1.059"
+            >
+              <div style="padding: 0 0 94.4153% 0"></div>
+              <img
+                id="g-age-360-img"
+                class="g-age-img g-aiImg"
+                alt=""
+                src="assets/AIHTML/age-360.png"
+              />
+              <div
+                id="g-ai0-1"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 2.9522%;
+                  margin-top: -19.8px;
+                  right: 93.6416%;
+                  width: 38px;
+                "
+              >
+                <p class="g-pstyle0">20</p>
+              </div>
+              <div
+                id="g-ai0-2"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 13.4968%;
+                  margin-top: -10.1px;
+                  left: 40.3801%;
+                  margin-left: -19.5px;
+                  width: 39px;
+                "
+              >
+                <p class="g-pstyle1">17</p>
+              </div>
+              <div
+                id="g-ai0-3"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 25.4801%;
+                  margin-top: -19.8px;
+                  right: 93.6416%;
+                  width: 38px;
+                "
+              >
+                <p class="g-pstyle0">15</p>
+              </div>
+              <div
+                id="g-ai0-4"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 31.9899%;
+                  margin-top: -10.1px;
+                  left: 54.1397%;
+                  margin-left: -19.5px;
+                  width: 39px;
+                "
+              >
+                <p class="g-pstyle1">13</p>
+              </div>
+              <div
+                id="g-ai0-5"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 31.9899%;
+                  margin-top: -10.1px;
+                  left: 67.8981%;
+                  margin-left: -19.5px;
+                  width: 39px;
+                "
+              >
+                <p class="g-pstyle1">13</p>
+              </div>
+              <div
+                id="g-ai0-6"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 48.0081%;
+                  margin-top: -19.8px;
+                  right: 93.6416%;
+                  width: 38px;
+                "
+              >
+                <p class="g-pstyle0">10</p>
+              </div>
+              <div
+                id="g-ai0-7"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 58.889%;
+                  margin-top: -10.1px;
+                  left: 81.1657%;
+                  margin-left: -15px;
+                  width: 30px;
+                "
+              >
+                <p class="g-pstyle1">7</p>
+              </div>
+              <div
+                id="g-ai0-8"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 70.536%;
+                  margin-top: -19.8px;
+                  right: 93.7095%;
+                  width: 30px;
+                "
+              >
+                <p class="g-pstyle0">5</p>
+              </div>
+              <div
+                id="g-ai0-9"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 72.3385%;
+                  margin-top: -10.1px;
+                  left: 95.3237%;
+                  margin-left: -15px;
+                  width: 30px;
+                "
+              >
+                <p class="g-pstyle1">4</p>
+              </div>
+              <div
+                id="g-ai0-10"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 76.0371%;
+                  margin-top: -10.1px;
+                  left: 12.2901%;
+                  margin-left: -15px;
+                  width: 30px;
+                "
+              >
+                <p class="g-pstyle1">3</p>
+              </div>
+              <div
+                id="g-ai0-11"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 80.4082%;
+                  margin-top: -10.1px;
+                  left: 26.5317%;
+                  margin-left: -15px;
+                  width: 30px;
+                "
+              >
+                <p class="g-pstyle1">2</p>
+              </div>
+              <div
+                id="g-ai0-12"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 93.0641%;
+                  margin-top: -19.8px;
+                  right: 93.7095%;
+                  width: 30px;
+                "
+              >
+                <p class="g-pstyle0">0</p>
+              </div>
+              <div
+                id="g-ai0-13"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 97.5418%;
+                  margin-top: -8.1px;
+                  right: 93.3333%;
+                  width: 43px;
+                "
+              >
+                <p class="g-pstyle2">Age</p>
+              </div>
+              <div
+                id="g-ai0-14"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 97.5418%;
+                  margin-top: -8.1px;
+                  right: 83.3803%;
+                  width: 46px;
+                "
+              >
+                <p class="g-pstyle2">0-10</p>
+              </div>
+              <div
+                id="g-ai0-15"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 97.5418%;
+                  margin-top: -8.1px;
+                  right: 69.1946%;
+                  width: 52px;
+                "
+              >
+                <p class="g-pstyle2">11-20</p>
+              </div>
+              <div
+                id="g-ai0-16"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 97.5418%;
+                  margin-top: -8.1px;
+                  right: 55.1848%;
+                  width: 53px;
+                "
+              >
+                <p class="g-pstyle2">21-30</p>
+              </div>
+              <div
+                id="g-ai0-17"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 97.5418%;
+                  margin-top: -8.1px;
+                  right: 41.3509%;
+                  width: 53px;
+                "
+              >
+                <p class="g-pstyle2">31-40</p>
+              </div>
+              <div
+                id="g-ai0-18"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 97.5418%;
+                  margin-top: -8.1px;
+                  right: 27.5174%;
+                  width: 53px;
+                "
+              >
+                <p class="g-pstyle2">41-50</p>
+              </div>
+              <div
+                id="g-ai0-19"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 97.5418%;
+                  margin-top: -8.1px;
+                  right: 13.6833%;
+                  width: 53px;
+                "
+              >
+                <p class="g-pstyle2">51-60</p>
+              </div>
+              <div
+                id="g-ai0-20"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 97.5418%;
+                  margin-top: -8.1px;
+                  right: -0.1504%;
+                  width: 53px;
+                "
+              >
+                <p class="g-pstyle2">61-70</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-container" style="margin-top: 15px">
+          <p style="color: #4a4a4a; font-size: 1.1rem; line-height: 1.6">
+            Fatalities peaked among those aged 21–30, with 17 lives lost. This
+            age group, alongside the 31–40 and 41–50 brackets, accounted for the
+            vast majority of shooting victims.
+          </p>
+        </div>
+      </div>
+
+      <div class="data-block" style="margin-bottom: 60px">
+        <div class="text-container">
+          <h3
+            style="
+              font-family: 'Source Sans Pro', sans-serif;
+              font-weight: 700;
+              color: #1a1a1a;
+              margin-bottom: 20px;
+            "
+          >
+            Monthly Breakdown of Shooting Deaths - 2025
+          </h3>
+        </div>
+
+        <div class="media-container" style="text-align: center">
+          <div id="g-monthly-box" class="ai2html">
+            <!-- Artboard: 330 -->
+            <div
+              id="g-monthly-330"
+              class="g-artboard"
+              style="max-width: 243px; max-height: 317px"
+              data-aspect-ratio="0.766"
+            >
+              <div style="padding: 0 0 130.5039% 0"></div>
+              <img
+                id="g-monthly-330-img"
+                class="g-monthly-img g-aiImg"
+                alt=""
+                src="assets/AIHTML/monthly-330.png"
+              />
+              <div
+                id="g-ai0-1"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 3.5864%;
+                  margin-top: -12.4px;
+                  right: -0.2524%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">9</p>
+              </div>
+              <div
+                id="g-ai0-2"
+                class="g-Layer_1 g-aiAbs"
+                style="top: -0.6307%; right: 65.4321%; width: 33.7449%"
+              >
+                <p class="g-pstyle1">January</p>
+                <p class="g-pstyle1">February</p>
+                <p class="g-pstyle1">March</p>
+                <p class="g-pstyle1">April</p>
+                <p class="g-pstyle1">May</p>
+                <p class="g-pstyle1">June</p>
+                <p class="g-pstyle1">July</p>
+                <p class="g-pstyle1">August</p>
+                <p class="g-pstyle1">September</p>
+                <p class="g-pstyle1">October</p>
+                <p class="g-pstyle1">November</p>
+                <p class="g-pstyle1">December</p>
+              </div>
+              <div
+                id="g-ai0-3"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 11.7851%;
+                  margin-top: -12.4px;
+                  right: -0.2524%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">9</p>
+              </div>
+              <div
+                id="g-ai0-4"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 20.6144%;
+                  margin-top: -12.4px;
+                  right: 31.5%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">4</p>
+              </div>
+              <div
+                id="g-ai0-5"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 28.4977%;
+                  margin-top: -12.4px;
+                  right: 31.5%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">4</p>
+              </div>
+              <div
+                id="g-ai0-6"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 37.0117%;
+                  margin-top: -12.4px;
+                  right: 31.5%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">4</p>
+              </div>
+              <div
+                id="g-ai0-7"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 45.2103%;
+                  margin-top: -12.4px;
+                  right: 39.0488%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">3</p>
+              </div>
+              <div
+                id="g-ai0-8"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 53.7243%;
+                  margin-top: -12.4px;
+                  right: 25.3384%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">5</p>
+              </div>
+              <div
+                id="g-ai0-9"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 61.923%;
+                  margin-top: -12.4px;
+                  right: -0.2524%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">9</p>
+              </div>
+              <div
+                id="g-ai0-10"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 70.437%;
+                  margin-top: -12.4px;
+                  right: 45.4035%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">2</p>
+              </div>
+              <div
+                id="g-ai0-11"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 78.6357%;
+                  margin-top: -12.4px;
+                  right: 38.4524%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">3</p>
+              </div>
+              <div
+                id="g-ai0-12"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 87.1497%;
+                  margin-top: -12.4px;
+                  right: 25.9428%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">5</p>
+              </div>
+              <div
+                id="g-ai0-13"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 95.3484%;
+                  margin-top: -12.4px;
+                  right: 39.0561%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle0">3</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-container" style="margin-top: 15px">
+          <p style="color: #4a4a4a; font-size: 1.1rem; line-height: 1.6">
+            Monthly data for 2025 shows fluctuating levels of violence.
+            Fatalities peaked at nine in January, February, and August, while
+            September recorded the year's lowest toll with just two deaths.
+          </p>
+        </div>
+      </div>
+
+      <div class="data-block" style="margin-bottom: 60px">
+        <div class="text-container">
+          <h3
+            style="
+              font-family: 'Source Sans Pro', sans-serif;
+              font-weight: 700;
+              color: #1a1a1a;
+              margin-bottom: 20px;
+            "
+          >
+            Types of Firearms Used in Shooting Deaths - 2025
+          </h3>
+        </div>
+
+        <div class="media-container" style="text-align: center">
+          <div id="g-guns-box" class="ai2html">
+            <!-- Artboard: 330 -->
+            <div
+              id="g-guns-330"
+              class="g-artboard"
+              style="max-width: 330px; max-height: 311px"
+              data-aspect-ratio="1.061"
+              data-min-width="0"
+              data-max-width="516"
+            >
+              <div style="padding: 0 0 94.2424% 0"></div>
+              <img
+                id="g-guns-330-img"
+                class="g-guns-img g-aiImg"
+                alt=""
+                src="assets/AIHTML/guns-330.jpg"
+              />
+              <div
+                id="g-ai0-1"
+                class="g-Layer_3 g-aiAbs"
+                style="top: 5.4662%; right: 57.93%; width: 24.8485%"
+              >
+                <p class="g-pstyle0">Galkatas</p>
+                <p class="g-pstyle1">(Locally</p>
+                <p class="g-pstyle1">manufactured)</p>
+              </div>
+              <div
+                id="g-ai0-2"
+                class="g-Layer_3 g-aiAbs"
+                style="
+                  top: 18.6495%;
+                  left: 72.139%;
+                  margin-left: -8.9394%;
+                  width: 17.8788%;
+                "
+              >
+                <p class="g-pstyle2">Revolver</p>
+                <p class="g-pstyle3">8</p>
+              </div>
+              <div
+                id="g-ai0-3"
+                class="g-Layer_3 g-aiAbs g-aiPointText"
+                style="
+                  top: 25.2663%;
+                  margin-top: -15.6px;
+                  left: 14.4308%;
+                  width: 34px;
+                "
+              >
+                <p class="g-pstyle4">2</p>
+              </div>
+              <div
+                id="g-ai0-4"
+                class="g-Layer_3 g-aiAbs"
+                style="top: 33.4405%; right: 46.6667%; width: 16.9697%"
+              >
+                <p class="g-pstyle0">Shotgun / 12-bore / 16-bore</p>
+              </div>
+              <div
+                id="g-ai0-5"
+                class="g-Layer_3 g-aiAbs g-aiPointText"
+                style="
+                  top: 47.1312%;
+                  margin-top: -15.6px;
+                  right: 68.6879%;
+                  width: 34px;
+                "
+              >
+                <p class="g-pstyle5">5</p>
+              </div>
+              <div
+                id="g-ai0-6"
+                class="g-Layer_3 g-aiAbs"
+                style="
+                  top: 53.3762%;
+                  left: 67.5216%;
+                  margin-left: -12.2727%;
+                  width: 24.5455%;
+                "
+              >
+                <p class="g-pstyle2">
+                  9mm Pistol / Handgun /<span class="g-cstyle0"> </span>
+                </p>
+                <p class="g-pstyle6">15</p>
+              </div>
+              <div
+                id="g-ai0-7"
+                class="g-Layer_3 g-aiAbs"
+                style="
+                  top: 74.2765%;
+                  left: 17.4435%;
+                  margin-left: -14.2424%;
+                  width: 28.4848%;
+                "
+              >
+                <p class="g-pstyle7">T-56</p>
+                <p class="g-pstyle8">(Assault Rifle)</p>
+                <p class="g-pstyle3">18</p>
+              </div>
+              <div
+                id="g-ai0-8"
+                class="g-Layer_3 g-aiAbs"
+                style="top: 78.4566%; right: 1.7353%; width: 22.1212%"
+              >
+                <p class="g-pstyle1">Licensed Firearm (Unspecified type)</p>
+              </div>
+              <div
+                id="g-ai0-9"
+                class="g-Layer_3 g-aiAbs g-aiPointText"
+                style="
+                  top: 83.7872%;
+                  margin-top: -15.6px;
+                  right: 19.3327%;
+                  width: 34px;
+                "
+              >
+                <p class="g-pstyle5">1</p>
+              </div>
+            </div>
+
+            <!-- Artboard: 550 -->
+            <div
+              id="g-guns-550"
+              class="g-artboard"
+              style="width: 517px; height: 470px"
+              data-aspect-ratio="1.1"
+              data-min-width="517"
+            >
+              <div style=""></div>
+              <img
+                id="g-guns-550-img"
+                class="g-guns-img g-aiImg"
+                alt=""
+                src="assets/AIHTML/guns-550.jpg"
+              />
+              <div
+                id="g-ai1-1"
+                class="g-Layer_3 g-aiAbs g-aiPointText"
+                style="
+                  top: 19.4761%;
+                  margin-top: -16.5px;
+                  left: 14.725%;
+                  width: 39px;
+                "
+              >
+                <p class="g-pstyle0">2</p>
+              </div>
+              <div
+                id="g-ai1-2"
+                class="g-Layer_3 g-aiAbs"
+                style="
+                  top: 16.8085%;
+                  left: 72.8122%;
+                  margin-left: -5.8994%;
+                  width: 11.7988%;
+                "
+              >
+                <p class="g-pstyle1">Revolver</p>
+                <p class="g-pstyle2">8</p>
+              </div>
+              <div
+                id="g-ai1-3"
+                class="g-Layer_3 g-aiAbs"
+                style="top: 22.3404%; left: 2.2766%; width: 18.7621%"
+              >
+                <p>Galkatas</p>
+                <p class="g-pstyle3">(Locally</p>
+                <p class="g-pstyle3">manufactured)</p>
+              </div>
+              <div
+                id="g-ai1-4"
+                class="g-Layer_3 g-aiAbs"
+                style="top: 30.2128%; right: 49.3971%; width: 13.5397%"
+              >
+                <p class="g-pstyle4">Shotgun / 12-bore / 16-bore</p>
+              </div>
+              <div
+                id="g-ai1-5"
+                class="g-Layer_3 g-aiAbs g-aiPointText"
+                style="
+                  top: 42.8803%;
+                  margin-top: -16.5px;
+                  right: 64.705%;
+                  width: 39px;
+                "
+              >
+                <p class="g-pstyle5">5</p>
+              </div>
+              <div
+                id="g-ai1-6"
+                class="g-Layer_3 g-aiAbs"
+                style="
+                  top: 55.3191%;
+                  left: 71.2563%;
+                  margin-left: -7.8337%;
+                  width: 15.6673%;
+                "
+              >
+                <p class="g-pstyle1">
+                  9mm Pistol / Handgun /<span class="g-cstyle0"> </span>
+                </p>
+                <p class="g-pstyle6">15</p>
+              </div>
+              <div
+                id="g-ai1-7"
+                class="g-Layer_3 g-aiAbs"
+                style="
+                  top: 75.7447%;
+                  left: 16.4758%;
+                  margin-left: -9.0909%;
+                  width: 18.1818%;
+                "
+              >
+                <p class="g-pstyle7">T-56</p>
+                <p class="g-pstyle8">(Assault Rifle)</p>
+                <p class="g-pstyle9">18</p>
+              </div>
+              <div
+                id="g-ai1-8"
+                class="g-Layer_3 g-aiAbs g-aiPointText"
+                style="
+                  top: 79.9016%;
+                  margin-top: -16.5px;
+                  right: 7.6071%;
+                  width: 39px;
+                "
+              >
+                <p class="g-pstyle5">1</p>
+              </div>
+              <div
+                id="g-ai1-9"
+                class="g-Layer_3 g-aiAbs"
+                style="top: 84.0426%; right: 2.9132%; width: 22.2437%"
+              >
+                <p class="g-pstyle10">Licensed</p>
+                <p class="g-pstyle10">Firearm</p>
+                <p class="g-pstyle11">(Unspecified type)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-container" style="margin-top: 15px">
+          <p style="color: #4a4a4a; font-size: 1.1rem; line-height: 1.6">
+            Military-style weapons dominated the statistics, with the T-56
+            assault rifle (18) and 9mm pistol (15) responsible for approximately
+            two-thirds (67%) of all shooting deaths.
+          </p>
+        </div>
+      </div>
+
+      <div class="data-block" style="margin-bottom: 60px">
+        <div class="text-container">
+          <h3
+            style="
+              font-family: 'Source Sans Pro', sans-serif;
+              font-weight: 700;
+              color: #1a1a1a;
+              margin-bottom: 20px;
+            "
+          >
+            Shooting Deaths by District - 2025
+          </h3>
+        </div>
+
+        <div class="media-container" style="text-align: center">
+          <div id="g-districts-box" class="ai2html">
+            <!-- Artboard: 330 -->
+            <div
+              id="g-districts-330"
+              class="g-artboard"
+              style="max-width: 281px; max-height: 263px"
+              data-aspect-ratio="1.068"
+            >
+              <div style="padding: 0 0 93.6268% 0"></div>
+              <img
+                id="g-districts-330-img"
+                class="g-districts-img g-aiImg"
+                alt=""
+                src="assets/AIHTML/districts-330.png"
+              />
+              <div
+                id="g-ai0-1"
+                class="g-Layer_1 g-aiAbs"
+                style="top: -1.1403%; right: 67.6157%; width: 32.3843%"
+              >
+                <p class="g-pstyle0">Kurunegala</p>
+                <p class="g-pstyle0">Ratnapura</p>
+                <p class="g-pstyle0">Mannar</p>
+                <p class="g-pstyle0">Puttalam</p>
+                <p class="g-pstyle0">Kalutara</p>
+                <p class="g-pstyle0">Matara</p>
+                <p class="g-pstyle0">Gampaha</p>
+                <p class="g-pstyle0">Hambantota</p>
+                <p class="g-pstyle0">Galle</p>
+                <p class="g-pstyle0">Colombo</p>
+              </div>
+              <div
+                id="g-ai0-2"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 4.7029%;
+                  margin-top: -12.4px;
+                  right: 57.8759%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle1">1</p>
+              </div>
+              <div
+                id="g-ai0-3"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 5.0825%;
+                  margin-top: -10.4px;
+                  right: 23.3046%;
+                  width: 72px;
+                "
+              >
+                <p class="g-pstyle2">Female</p>
+              </div>
+              <div
+                id="g-ai0-4"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 5.0824%;
+                  margin-top: -10.4px;
+                  right: -0.0945%;
+                  width: 55px;
+                "
+              >
+                <p class="g-pstyle2">Male</p>
+              </div>
+              <div
+                id="g-ai0-5"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 14.9655%;
+                  margin-top: -12.4px;
+                  right: 57.8759%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle1">1</p>
+              </div>
+              <div
+                id="g-ai0-6"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 24.848%;
+                  margin-top: -12.4px;
+                  right: 54.3064%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle1">2</p>
+              </div>
+              <div
+                id="g-ai0-7"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 35.1106%;
+                  margin-top: -12.4px;
+                  right: 54.3064%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle1">2</p>
+              </div>
+              <div
+                id="g-ai0-8"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 45.3732%;
+                  margin-top: -12.4px;
+                  right: 51.3401%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle1">3</p>
+              </div>
+              <div
+                id="g-ai0-9"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 55.2557%;
+                  margin-top: -12.4px;
+                  right: 48.2559%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle1">4</p>
+              </div>
+              <div
+                id="g-ai0-10"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 65.5183%;
+                  margin-top: -12.4px;
+                  right: 38.0515%;
+                  width: 32px;
+                "
+              >
+                <p class="g-pstyle1">7</p>
+              </div>
+              <div
+                id="g-ai0-11"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 75.7809%;
+                  margin-top: -12.4px;
+                  right: 21.6196%;
+                  width: 41px;
+                "
+              >
+                <p class="g-pstyle1">11</p>
+              </div>
+              <div
+                id="g-ai0-12"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 85.6634%;
+                  margin-top: -12.4px;
+                  right: 18.0508%;
+                  width: 42px;
+                "
+              >
+                <p class="g-pstyle1">12</p>
+              </div>
+              <div
+                id="g-ai0-13"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 95.926%;
+                  margin-top: -12.4px;
+                  right: 0.4942%;
+                  width: 42px;
+                "
+              >
+                <p class="g-pstyle1">17</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-container" style="margin-top: 15px">
+          <p style="color: #4a4a4a; font-size: 1.1rem; line-height: 1.6">
+            The Western Province remains the most affected region. Colombo
+            recorded the highest toll with 17 deaths, followed by Gampaha (12)
+            and Kalutara (11).
+          </p>
+        </div>
+      </div>
+
+      <div class="data-block" style="margin-bottom: 60px">
+        <div class="text-container">
+          <h3
+            style="
+              font-family: 'Source Sans Pro', sans-serif;
+              font-weight: 700;
+              color: #1a1a1a;
+              margin-bottom: 20px;
+            "
+          >
+            Locations of Shooting Deaths - 2025
+          </h3>
+        </div>
+
+        <div class="media-container" style="text-align: center">
+          <div id="g-locations-box" class="ai2html">
+            <!-- Artboard: 550 -->
+            <div
+              id="g-locations-550"
+              class="g-artboard"
+              style="width: 538px; height: 938px"
+              data-aspect-ratio="0.574"
+              data-min-width="538"
+            >
+              <div style=""></div>
+              <img
+                id="g-locations-550-img"
+                class="g-locations-img g-aiImg"
+                alt=""
+                src="assets/AIHTML/locations-550.png"
+              />
+              <div
+                id="g-ai0-1"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 23.644%;
+                  margin-top: -9.8px;
+                  right: 82.8047%;
+                  width: 70px;
+                "
+              >
+                <p class="g-pstyle0">Mannar</p>
+              </div>
+              <div
+                id="g-ai0-2"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 54.5608%;
+                  margin-top: -9.8px;
+                  left: 21.115%;
+                  width: 77px;
+                "
+              >
+                <p class="g-pstyle1">Hettipola</p>
+              </div>
+              <div
+                id="g-ai0-3"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 59.7846%;
+                  margin-top: -9.8px;
+                  left: 10.6557%;
+                  width: 78px;
+                "
+              >
+                <p class="g-pstyle1">Marawila</p>
+              </div>
+              <div
+                id="g-ai0-4"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 66.7143%;
+                  margin-top: -9.8px;
+                  left: 23.5856%;
+                  width: 80px;
+                "
+              >
+                <p class="g-pstyle1">Mirigama</p>
+              </div>
+              <div
+                id="g-ai0-5"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 73.6439%;
+                  margin-top: -9.8px;
+                  right: 88.8414%;
+                  width: 78px;
+                "
+              >
+                <p class="g-pstyle0">Colombo</p>
+              </div>
+              <div
+                id="g-ai0-6"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 74.177%;
+                  margin-top: -9.8px;
+                  left: 22.8766%;
+                  width: 80px;
+                "
+              >
+                <p class="g-pstyle1">Meegoda</p>
+              </div>
+              <div
+                id="g-ai0-7"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 77.8017%;
+                  margin-top: -9.8px;
+                  right: 86.5494%;
+                  width: 90px;
+                "
+              >
+                <p class="g-pstyle0">Mt. Lavinia</p>
+              </div>
+              <div
+                id="g-ai0-8"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 81.6397%;
+                  margin-top: -9.8px;
+                  left: 45.2347%;
+                  width: 88px;
+                "
+              >
+                <p class="g-pstyle1">Kahawatta</p>
+              </div>
+              <div
+                id="g-ai0-9"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 86.4371%;
+                  margin-top: -9.8px;
+                  left: 30.7804%;
+                  width: 81px;
+                "
+              >
+                <p class="g-pstyle1">Hiniduma</p>
+              </div>
+              <div
+                id="g-ai0-10"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 88.1428%;
+                  margin-top: -9.8px;
+                  left: 52.2367%;
+                  width: 86px;
+                "
+              >
+                <p class="g-pstyle1">Middeniya</p>
+              </div>
+              <div
+                id="g-ai0-11"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 88.9958%;
+                  margin-top: -9.8px;
+                  left: 76.21%;
+                  width: 122px;
+                "
+              >
+                <p class="g-pstyle1">Tissamaharama</p>
+              </div>
+              <div
+                id="g-ai0-12"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 90.4883%;
+                  margin-top: -9.8px;
+                  right: 80.6561%;
+                  width: 108px;
+                "
+              >
+                <p class="g-pstyle0">Ambalangoda</p>
+              </div>
+              <div
+                id="g-ai0-13"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 95.0725%;
+                  margin-top: -9.8px;
+                  left: 59.0874%;
+                  width: 83px;
+                "
+              >
+                <p class="g-pstyle1">Hungama</p>
+              </div>
+              <div
+                id="g-ai0-14"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 96.1386%;
+                  margin-top: -9.8px;
+                  right: 17.5574%;
+                  width: 30px;
+                "
+              >
+                <p class="g-pstyle0">1</p>
+              </div>
+              <div
+                id="g-ai0-15"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 96.1386%;
+                  margin-top: -9.8px;
+                  right: 13.8824%;
+                  width: 30px;
+                "
+              >
+                <p class="g-pstyle0">2</p>
+              </div>
+              <div
+                id="g-ai0-16"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 96.1386%;
+                  margin-top: -9.8px;
+                  right: 10.2074%;
+                  width: 30px;
+                "
+              >
+                <p class="g-pstyle0">3</p>
+              </div>
+              <div
+                id="g-ai0-17"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 96.9915%;
+                  margin-top: -9.8px;
+                  left: 53.8835%;
+                  width: 74px;
+                "
+              >
+                <p class="g-pstyle1">Tangalle</p>
+              </div>
+              <div
+                id="g-ai0-18"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 97.6311%;
+                  margin-top: -9.8px;
+                  right: 65.9287%;
+                  width: 84px;
+                "
+              >
+                <p class="g-pstyle0">Weligama</p>
+              </div>
+              <div
+                id="g-ai0-19"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 98.0575%;
+                  margin-top: -9.8px;
+                  left: 2.2418%;
+                  width: 60px;
+                "
+              >
+                <p class="g-pstyle1">20 km</p>
+              </div>
+              <div
+                id="g-ai0-20"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 98.1642%;
+                  margin-top: -9.8px;
+                  left: 46.3492%;
+                  width: 68px;
+                "
+              >
+                <p class="g-pstyle1">Dondra</p>
+              </div>
+            </div>
+
+            <!-- Artboard: 330 -->
+            <div
+              id="g-locations-330"
+              class="g-artboard"
+              style="max-width: 330px; max-height: 575px"
+              data-aspect-ratio="0.574"
+              data-min-width="0"
+              data-max-width="537"
+            >
+              <div style="padding: 0 0 174.2804% 0"></div>
+              <img
+                id="g-locations-330-img"
+                class="g-locations-img g-aiImg"
+                alt=""
+                src="assets/AIHTML/locations-330.png"
+              />
+              <div
+                id="g-ai1-1"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 23.5611%;
+                  margin-top: -7.5px;
+                  right: 83.0001%;
+                  width: 59px;
+                "
+              >
+                <p class="g-pstyle0">Mannar</p>
+              </div>
+              <div
+                id="g-ai1-2"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 54.5109%;
+                  margin-top: -7.5px;
+                  left: 21.1062%;
+                  width: 65px;
+                "
+              >
+                <p class="g-pstyle1">Hettipola</p>
+              </div>
+              <div
+                id="g-ai1-3"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 59.7271%;
+                  margin-top: -7.5px;
+                  left: 10.6513%;
+                  width: 66px;
+                "
+              >
+                <p class="g-pstyle1">Marawila</p>
+              </div>
+              <div
+                id="g-ai1-4"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 66.6821%;
+                  margin-top: -7.5px;
+                  left: 23.576%;
+                  width: 67px;
+                "
+              >
+                <p class="g-pstyle1">Mirigama</p>
+              </div>
+              <div
+                id="g-ai1-5"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 67.5515%;
+                  margin-top: -7.5px;
+                  right: 85.2113%;
+                  width: 66px;
+                "
+              >
+                <p class="g-pstyle0">Colombo</p>
+              </div>
+              <div
+                id="g-ai1-6"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 73.9849%;
+                  margin-top: -7.5px;
+                  left: 22.8675%;
+                  width: 68px;
+                "
+              >
+                <p class="g-pstyle1">Meegoda</p>
+              </div>
+              <div
+                id="g-ai1-7"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 81.4615%;
+                  margin-top: -7.5px;
+                  left: 45.2169%;
+                  width: 74px;
+                "
+              >
+                <p class="g-pstyle1">Kahawatta</p>
+              </div>
+              <div
+                id="g-ai1-8"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 85.4606%;
+                  margin-top: -7.5px;
+                  right: 82.4266%;
+                  width: 75px;
+                "
+              >
+                <p class="g-pstyle0">Mt. Lavinia</p>
+              </div>
+              <div
+                id="g-ai1-9"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 86.33%;
+                  margin-top: -7.5px;
+                  left: 30.7679%;
+                  width: 68px;
+                "
+              >
+                <p class="g-pstyle1">Hiniduma</p>
+              </div>
+              <div
+                id="g-ai1-10"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 87.5472%;
+                  margin-top: -7.5px;
+                  left: 73.1496%;
+                  width: 100px;
+                "
+              >
+                <p class="g-pstyle1">Tissamaharama</p>
+              </div>
+              <div
+                id="g-ai1-11"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 88.0687%;
+                  margin-top: -7.5px;
+                  left: 52.2159%;
+                  width: 72px;
+                "
+              >
+                <p class="g-pstyle1">Middeniya</p>
+              </div>
+              <div
+                id="g-ai1-12"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 92.0679%;
+                  margin-top: -7.5px;
+                  right: 78.7379%;
+                  width: 90px;
+                "
+              >
+                <p class="g-pstyle0">Ambalangoda</p>
+              </div>
+              <div
+                id="g-ai1-13"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 93.9805%;
+                  margin-top: -7.5px;
+                  left: 60.8819%;
+                  width: 70px;
+                "
+              >
+                <p class="g-pstyle1">Hungama</p>
+              </div>
+              <div
+                id="g-ai1-14"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 96.067%;
+                  margin-top: -7.5px;
+                  right: 17.6651%;
+                  width: 28px;
+                "
+              >
+                <p class="g-pstyle0">1</p>
+              </div>
+              <div
+                id="g-ai1-15"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 96.067%;
+                  margin-top: -7.5px;
+                  right: 12.1739%;
+                  width: 28px;
+                "
+              >
+                <p class="g-pstyle0">2</p>
+              </div>
+              <div
+                id="g-ai1-16"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 96.067%;
+                  margin-top: -7.5px;
+                  right: 7.2881%;
+                  width: 28px;
+                "
+              >
+                <p class="g-pstyle0">3</p>
+              </div>
+              <div
+                id="g-ai1-17"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 96.4148%;
+                  margin-top: -7.5px;
+                  left: 55.0743%;
+                  width: 63px;
+                "
+              >
+                <p class="g-pstyle1">Tangalle</p>
+              </div>
+              <div
+                id="g-ai1-18"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 97.458%;
+                  margin-top: -7.5px;
+                  right: 65.8552%;
+                  width: 71px;
+                "
+              >
+                <p class="g-pstyle0">Weligama</p>
+              </div>
+              <div
+                id="g-ai1-19"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 97.9797%;
+                  margin-top: -7.5px;
+                  left: 2.2408%;
+                  width: 52px;
+                "
+              >
+                <p class="g-pstyle1">20 km</p>
+              </div>
+              <div
+                id="g-ai1-20"
+                class="g-Layer_1 g-aiAbs g-aiPointText"
+                style="
+                  top: 98.5013%;
+                  margin-top: -7.5px;
+                  left: 46.3311%;
+                  width: 58px;
+                "
+              >
+                <p class="g-pstyle1">Dondra</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-block" style="margin-bottom: 60px">
+        <div class="text-container">
+          <h3
+            style="
+              font-family: 'Source Sans Pro', sans-serif;
+              font-weight: 700;
+              color: #1a1a1a;
+              margin-bottom: 20px;
+            "
+          >
+            Shooting Deaths by Motives - 2025
+          </h3>
+        </div>
+
+        <div class="media-container" style="text-align: center">
+          <div id="g-motives-box" class="ai2html">
+            <!-- Artboard: 330 -->
+            <div
+              id="g-motives-330"
+              class="g-artboard"
+              style="max-width: 262px; max-height: 194px"
+              data-aspect-ratio="1.349"
+            >
+              <div style="padding: 0 0 74.1174% 0"></div>
+              <img
+                id="g-motives-330-img"
+                class="g-motives-img g-aiImg"
+                alt=""
+                src="assets/AIHTML/motives-330.png"
+              />
+              <div
+                id="g-ai0-1"
+                class="g-Layer_1 g-aiAbs"
+                style="
+                  top: 69.0055%;
+                  left: 24.3613%;
+                  margin-left: -21.5649%;
+                  width: 43.1298%;
+                "
+              >
+                <p class="g-pstyle0">Organised crime and drug trafficking</p>
+                <p class="g-pstyle1">46</p>
+              </div>
+              <div
+                id="g-ai0-2"
+                class="g-Layer_1 g-aiAbs"
+                style="
+                  top: 69.0055%;
+                  left: 81.5256%;
+                  margin-left: -18.3206%;
+                  width: 36.6412%;
+                "
+              >
+                <p class="g-pstyle0">Personal dispute/ Other</p>
+                <p class="g-pstyle1">14</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-container" style="margin-top: 15px">
+          <p style="color: #4a4a4a; font-size: 1.1rem; line-height: 1.6">
+            Organised crime and drug trafficking were the dominant motives,
+            behind 46 of the 60 shooting deaths (over 75%). The remaining
+            incidents were largely personal disputes, with three notable
+            outliers: a self-defence case, the accidental hunting death of a
+            9-year-old girl in Hettipola, and a fatal shooting in Meerigama over
+            durian theft.
+          </p>
+        </div>
+      </div>
+      <div
+        class="text-container"
+        style="
+          margin-top: 80px;
+          margin-bottom: 40px;
+          border-top: 1px solid #d1d1d1;
+          padding-top: 20px;
+        "
+      >
+        <p
+          style="
+            font-size: 12px;
+            font-style: italic;
+            color: #6b6b6b;
+            line-height: 1.6;
+          "
+        >
+          This visual analysis is based on incident reports compiled throughout
+          2025. Data were cross-referenced with local news media.
+        </p>
+      </div>
+    </section>
+
+    <script src="script.js"></script>
+
+    <script type="text/javascript">
+      (function () {
+        // Only want one resizer on the page
+        if (
+          document.documentElement.className.indexOf("g-resizer-v3-init") > -1
+        )
+          return;
+        document.documentElement.className += " g-resizer-v3-init";
+        // Require IE9+
+        if (!("querySelector" in document)) return;
+        function resizer() {
+          var elements = Array.prototype.slice.call(
+              document.querySelectorAll(".g-artboard[data-min-width]")
+            ),
+            widthById = {};
+          elements.forEach(function (el) {
+            var parent = el.parentNode,
+              width =
+                widthById[parent.id] || parent.getBoundingClientRect().width,
+              minwidth = el.getAttribute("data-min-width"),
+              maxwidth = el.getAttribute("data-max-width");
+            widthById[parent.id] = width;
+            if (
+              +minwidth <= width &&
+              (+maxwidth >= width || maxwidth === null)
+            ) {
+              el.style.display = "block";
+            } else {
+              el.style.display = "none";
+            }
+          });
+          try {
+            if (window.parent && window.parent.$) {
+              window.parent.$("body").trigger("resizedcontent", [window]);
+            }
+          } catch (e) {
+            console.log(e);
+          }
+        }
+        document.addEventListener("DOMContentLoaded", resizer);
+        // Throttle the resize event to prevent performance lag
+        var timeout;
+        window.addEventListener("resize", function () {
+          clearTimeout(timeout);
+          timeout = setTimeout(resizer, 250);
+        });
+      })();
+    </script>
+  </body>
+</html>
