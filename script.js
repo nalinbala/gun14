@@ -795,7 +795,6 @@ function applyMotivationForces() {
     .alpha(1)
     .restart();
 }
-
 function applyDistrictForces() {
   clearLabels();
   restoreGenderView();
@@ -812,31 +811,63 @@ function applyDistrictForces() {
     "kurunegala",
     "ratnapura",
   ];
+
   const districtCounts = {};
   nodes.forEach(
     (d) => (districtCounts[d.district] = (districtCounts[d.district] || 0) + 1)
   );
 
   if (isMobileView) {
-    // MOBILE VIEW: 3 Columns, NO NUMBERS OR BADGES
+    // MOBILE VIEW: 3-Column Centered Grid
     const cols = 3;
-    const colWidth = width / (cols + 1);
-    const rowHeight = height * 0.18; // Tight, clean spacing
-    const dotBaseY = height * 0.22;
+    const rowHeight = 150; // Exact pixel spacing to prevent overlap
+    const dotBaseY = 200; // Pushed down safely below the header
 
     districtsDesktop.forEach((dist, i) => {
-      let xPos = ((i % cols) + 1) * colWidth;
-      let yPosLabel = dotBaseY + Math.floor(i / cols) * rowHeight + 50;
+      const row = Math.floor(i / cols);
+      const col = i % cols;
 
-      d3.select("#labels")
+      // Magic math: Automatically centers the bottom rows if they have 1 or 2 items!
+      const itemsInThisRow = Math.min(
+        cols,
+        districtsDesktop.length - row * cols
+      );
+      const dynamicColWidth = width / (itemsInThisRow + 1);
+      const xPos = (col + 1) * dynamicColWidth;
+
+      const yPosLabel = dotBaseY + row * rowHeight + 55;
+
+      const group = d3.select("#labels");
+
+      // Text Label
+      group
         .append("text")
         .attr("x", xPos)
         .attr("y", yPosLabel)
         .attr("text-anchor", "middle")
-        .style("font-size", "16px")
+        .style("font-size", "15px")
         .style("font-weight", "bold")
         .style("fill", "#1a1a1a")
         .text(dist.charAt(0).toUpperCase() + dist.slice(1));
+
+      // Restored Black Badge
+      group
+        .append("circle")
+        .attr("cx", xPos)
+        .attr("cy", yPosLabel + 22)
+        .attr("r", 14)
+        .style("fill", "#000");
+
+      // Restored Number
+      group
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", yPosLabel + 22)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "middle")
+        .style("fill", "#fff")
+        .style("font-size", "13px")
+        .text(districtCounts[dist] || 0);
     });
 
     simulation
@@ -845,7 +876,14 @@ function applyDistrictForces() {
         d3
           .forceX((d) => {
             const i = districtsDesktop.indexOf(d.district);
-            return ((i % cols) + 1) * colWidth;
+            const row = Math.floor(i / cols);
+            const col = i % cols;
+            const itemsInThisRow = Math.min(
+              cols,
+              districtsDesktop.length - row * cols
+            );
+            const dynamicColWidth = width / (itemsInThisRow + 1);
+            return (col + 1) * dynamicColWidth;
           })
           .strength(0.8)
       )
@@ -854,14 +892,15 @@ function applyDistrictForces() {
         d3
           .forceY((d) => {
             const i = districtsDesktop.indexOf(d.district);
-            return dotBaseY + Math.floor(i / cols) * rowHeight;
+            const row = Math.floor(i / cols);
+            return dotBaseY + row * rowHeight;
           })
           .strength(0.8)
       )
       .alpha(1)
       .restart();
   } else {
-    // DESKTOP VIEW: Split into two rows of 5 WITH numbers
+    // DESKTOP VIEW: Split into two rows of 5
     const colsDesk = 5;
     const colWidthDesk = width / (colsDesk + 1);
     const rowHeightDesk = height * 0.32;
@@ -915,147 +954,6 @@ function applyDistrictForces() {
           .forceY((d) => {
             const i = districtsDesktop.indexOf(d.district);
             return dotBaseYDesk + Math.floor(i / colsDesk) * rowHeightDesk;
-          })
-          .strength(0.8)
-      )
-      .alpha(1)
-      .restart();
-  }
-}
-
-function applyMonthForces() {
-  clearLabels();
-  restoreGenderView();
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const shortMonths = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const monthCounts = {};
-  nodes.forEach(
-    (d) => (monthCounts[d.month] = (monthCounts[d.month] || 0) + 1)
-  );
-
-  if (isMobileView) {
-    // MOBILE VIEW: 3 Columns, NO NUMBERS OR BADGES
-    const cols = 3;
-    const colWidth = width / (cols + 1);
-    const rowHeight = height * 0.18;
-    const dotBaseY = height * 0.22;
-
-    months.forEach((month, i) => {
-      const xPos = ((i % cols) + 1) * colWidth;
-      const yPosLabel = dotBaseY + Math.floor(i / cols) * rowHeight + 50;
-
-      d3.select("#labels")
-        .append("text")
-        .attr("x", xPos)
-        .attr("y", yPosLabel)
-        .attr("text-anchor", "middle")
-        .style("font-size", "16px")
-        .style("font-weight", "bold")
-        .style("fill", "#1a1a1a")
-        .text(shortMonths[i]);
-    });
-
-    simulation
-      .force(
-        "x",
-        d3
-          .forceX((d) => {
-            const i = months.indexOf(d.month);
-            return ((i % cols) + 1) * colWidth;
-          })
-          .strength(0.8)
-      )
-      .force(
-        "y",
-        d3
-          .forceY((d) => {
-            const i = months.indexOf(d.month);
-            return dotBaseY + Math.floor(i / cols) * rowHeight;
-          })
-          .strength(0.8)
-      )
-      .alpha(1)
-      .restart();
-  } else {
-    // DESKTOP VIEW: 6 columns, WITH badges
-    const cols = 6;
-    const colWidth = width / (cols + 1);
-    const rowHeight = height * 0.32;
-    const dotBaseY = height * 0.4;
-
-    months.forEach((month, i) => {
-      const xPos = ((i % cols) + 1) * colWidth;
-      const yPosLabel = dotBaseY + Math.floor(i / cols) * rowHeight + 90;
-
-      const group = d3.select("#labels");
-      group
-        .append("text")
-        .attr("x", xPos)
-        .attr("y", yPosLabel)
-        .attr("text-anchor", "middle")
-        .style("font-size", "22px")
-        .style("font-weight", "bold")
-        .style("fill", "#1a1a1a")
-        .text(shortMonths[i]);
-      group
-        .append("circle")
-        .attr("cx", xPos)
-        .attr("cy", yPosLabel + 25)
-        .attr("r", 18)
-        .style("fill", "#000");
-      group
-        .append("text")
-        .attr("x", xPos)
-        .attr("y", yPosLabel + 25)
-        .attr("dy", "0.35em")
-        .attr("text-anchor", "middle")
-        .style("fill", "#fff")
-        .style("font-size", "16px")
-        .text(monthCounts[month] || 0);
-    });
-
-    simulation
-      .force(
-        "x",
-        d3
-          .forceX((d) => {
-            const i = months.indexOf(d.month);
-            return ((i % cols) + 1) * colWidth;
-          })
-          .strength(0.8)
-      )
-      .force(
-        "y",
-        d3
-          .forceY((d) => {
-            const i = months.indexOf(d.month);
-            return dotBaseY + Math.floor(i / cols) * rowHeight;
           })
           .strength(0.8)
       )
