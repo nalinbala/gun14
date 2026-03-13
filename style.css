@@ -877,34 +877,32 @@ div[id^="g-"] {
 /* ========================================= */
 /* MOBILE RESPONSIVENESS MASTER BLOCK        */
 /* ========================================= */
-/* ========================================= */
-/* MOBILE RESPONSIVENESS MASTER BLOCK        */
-/* ========================================= */
 @media (max-width: 768px) {
-  /* 2. Optimize the Scrollytelling Text Area */
+  /* No more SVG hiding or massive font scaling! */
+
+  /* 1. Optimize the Scrollytelling Text Area */
   .content {
-    width: 95vw !important; /* Widens the text area to reduce height */
+    width: 95vw !important; /* Widens text area to reduce height */
     max-width: 95vw !important;
-    top: 150px !important; /* Pushes text down, safely below legends */
+    top: 150px !important; /* Moves down to avoid crowding the legend */
   }
 
   .content h1,
   .content h2 {
-    line-height: 1.1 !important; /* Tightens heading gaps */
+    line-height: 1.1 !important; /* Decreased line height */
     margin-bottom: 5px !important;
   }
 
   .content p {
-    line-height: 1.3 !important; /* Tightens paragraph gaps */
+    line-height: 1.3 !important; /* Decreased line height */
     font-size: 1.05rem !important;
   }
 
-  /* 3. Reduce the massive gap between the intro and static section */
+  /* 2. Reduce empty space in non-D3 sections */
   .bridge-section {
     padding-bottom: 10vh;
   }
 
-  /* 4. Shrink the massive desktop text to fit phone screens */
   .names-text {
     font-size: 26px;
     padding: 0 15px;
@@ -914,7 +912,6 @@ div[id^="g-"] {
     font-size: 45px;
   }
 
-  /* 5. Make the bridge paragraph elegant on mobile */
   .bridge-paragraph {
     font-size: 20px;
     line-height: 1.5;
