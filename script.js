@@ -651,12 +651,13 @@ function clearLabels() {
 }
 
 function addSvgLabel(text, x, y) {
+  const mobile = window.innerWidth < 768;
   d3.select("#labels")
     .append("text")
     .attr("x", x)
     .attr("y", y)
     .attr("text-anchor", "middle")
-    .style("font-size", "26px")
+    .style("font-size", mobile ? "45px" : "26px") /* MASSIVE mobile font */
     .style("font-weight", "bold")
     .style("fill", "#1a1a1a")
     .text(text);
@@ -727,6 +728,10 @@ function applyAgeForces() {
 /* ADAPTIVE D3 FORCE FUNCTIONS - RESIZED     */
 /* ========================================= */
 
+/* ========================================= */
+/* ADAPTIVE D3 FORCE FUNCTIONS - RESIZED     */
+/* ========================================= */
+
 const getMobileState = () => window.innerWidth < 768;
 
 function applyGenderForces() {
@@ -736,11 +741,11 @@ function applyGenderForces() {
 
   const xM = mobile ? width * 0.35 : width / 3;
   const xF = mobile ? width * 0.75 : (width / 3) * 2;
-  // MOVED UP: Was 450, now 280 to close the gap under the heading
   const yBase = mobile ? 280 : height / 2;
 
-  addSvgLabel("Male (54)", xM, yBase + (mobile ? 280 : 200));
-  addSvgLabel("Female (6)", xF, yBase + (mobile ? 280 : 200));
+  // Pushed down an extra 70px to clear the massive new text
+  addSvgLabel("Male (54)", xM, yBase + (mobile ? 350 : 200));
+  addSvgLabel("Female (6)", xF, yBase + (mobile ? 350 : 200));
 
   simulation
     .force("x", d3.forceX((d) => (d.gender === "M" ? xM : xF)).strength(0.1))
@@ -756,11 +761,11 @@ function applyMotivationForces() {
 
   const xC = mobile ? width * 0.35 : width / 3;
   const xP = mobile ? width * 0.75 : (width / 3) * 2;
-  // MOVED UP: Was 450, now 280
   const yBase = mobile ? 280 : height / 2;
 
-  addSvgLabel("Organised Crime (46)", xC, yBase + (mobile ? 280 : 250));
-  addSvgLabel("Personal/Other (14)", xP, yBase + (mobile ? 280 : 200));
+  // Pushed down an extra 70px to clear the massive new text
+  addSvgLabel("Organised Crime (46)", xC, yBase + (mobile ? 350 : 250));
+  addSvgLabel("Personal/Other (14)", xP, yBase + (mobile ? 350 : 200));
 
   simulation
     .force(
@@ -796,10 +801,15 @@ function applyDistrictForces() {
   const cols = mobile ? 3 : 5;
   const colWidth = width / (cols + 1);
 
-  // TIGHTENED & MOVED UP to eliminate the huge gap
-  const rowHeight = mobile ? 210 : 0;
-  const dotBaseY = mobile ? 120 : height / 2 - 50;
-  const labelBaseY = mobile ? 220 : height / 2 + 180;
+  // SPREAD OUT: Increased rowHeight and dynamically scaled labels/badges
+  const rowHeight = mobile ? 250 : 0;
+  const dotBaseY = mobile ? 130 : height / 2 - 50;
+  const labelBaseY = mobile ? 260 : height / 2 + 180;
+
+  const labelSize = mobile ? "42px" : "22px";
+  const badgeR = mobile ? 32 : 18;
+  const badgeOffset = mobile ? 55 : 35;
+  const numSize = mobile ? "30px" : "16px";
 
   districts.forEach((dist, i) => {
     let xPos, yPos;
@@ -820,22 +830,23 @@ function applyDistrictForces() {
       .attr("x", xPos)
       .attr("y", yPos)
       .attr("text-anchor", "middle")
-      .style("font-size", "22px")
+      .style("font-size", labelSize)
       .style("font-weight", "bold")
       .text(dist.charAt(0).toUpperCase() + dist.slice(1));
     group
       .append("circle")
       .attr("cx", xPos)
-      .attr("cy", yPos + 35)
-      .attr("r", 18)
+      .attr("cy", yPos + badgeOffset)
+      .attr("r", badgeR)
       .style("fill", "#000");
     group
       .append("text")
       .attr("x", xPos)
-      .attr("y", yPos + 35)
+      .attr("y", yPos + badgeOffset)
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
       .style("fill", "#fff")
+      .style("font-size", numSize)
       .text(districtCounts[dist] || 0);
   });
 
@@ -909,10 +920,15 @@ function applyMonthForces() {
   const cols = mobile ? 3 : 6;
   const colWidth = width / (cols + 1);
 
-  // TIGHTENED & MOVED UP
-  const rowHeight = mobile ? 210 : 350;
-  const dotBaseY = mobile ? 120 : 350;
-  const labelBaseY = mobile ? 220 : 490;
+  // SPREAD OUT: Using the exact same dynamic math as the District grid
+  const rowHeight = mobile ? 250 : 350;
+  const dotBaseY = mobile ? 130 : 350;
+  const labelBaseY = mobile ? 260 : 490;
+
+  const labelSize = mobile ? "42px" : "22px";
+  const badgeR = mobile ? 32 : 18;
+  const badgeOffset = mobile ? 55 : 35;
+  const numSize = mobile ? "30px" : "16px";
 
   months.forEach((month, i) => {
     const xPos = ((i % cols) + 1) * colWidth;
@@ -924,22 +940,23 @@ function applyMonthForces() {
       .attr("x", xPos)
       .attr("y", yPos)
       .attr("text-anchor", "middle")
-      .style("font-size", "22px")
+      .style("font-size", labelSize)
       .style("font-weight", "bold")
       .text(shortMonths[i]);
     group
       .append("circle")
       .attr("cx", xPos)
-      .attr("cy", yPos + 35)
-      .attr("r", 18)
+      .attr("cy", yPos + badgeOffset)
+      .attr("r", badgeR)
       .style("fill", "#000");
     group
       .append("text")
       .attr("x", xPos)
-      .attr("y", yPos + 35)
+      .attr("y", yPos + badgeOffset)
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
       .style("fill", "#fff")
+      .style("font-size", numSize)
       .text(monthCounts[month] || 0);
   });
 

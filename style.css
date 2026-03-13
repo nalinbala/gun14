@@ -881,14 +881,6 @@ div[id^="g-"] {
 /* MOBILE RESPONSIVENESS MASTER BLOCK        */
 /* ========================================= */
 @media (max-width: 768px) {
-  /* 1. Scale up D3 labels to be highly readable on mobile */
-  #labels text {
-    font-size: 34px !important; /* Drastically increases text size */
-  }
-  #labels circle {
-    r: 28px !important; /* Expands the black number badges to fit */
-  }
-
   /* 2. Optimize the Scrollytelling Text Area */
   .content {
     width: 95vw !important; /* Widens the text area to reduce height */
