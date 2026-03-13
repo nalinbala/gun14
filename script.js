@@ -723,6 +723,10 @@ function applyAgeForces() {
 /* ADAPTIVE D3 FORCE FUNCTIONS - RESIZED     */
 /* ========================================= */
 
+/* ========================================= */
+/* ADAPTIVE D3 FORCE FUNCTIONS - RESIZED     */
+/* ========================================= */
+
 const getMobileState = () => window.innerWidth < 768;
 
 function applyGenderForces() {
@@ -730,13 +734,13 @@ function applyGenderForces() {
   restoreGenderView();
   const mobile = getMobileState();
 
-  // Side-by-side layout for both Desktop AND Mobile!
   const xM = mobile ? width * 0.35 : width / 3;
   const xF = mobile ? width * 0.75 : (width / 3) * 2;
-  const yBase = mobile ? 450 : height / 2;
+  // MOVED UP: Was 450, now 280 to close the gap under the heading
+  const yBase = mobile ? 280 : height / 2;
 
-  addSvgLabel("Male (54)", xM, yBase + (mobile ? 260 : 200));
-  addSvgLabel("Female (6)", xF, yBase + (mobile ? 260 : 200));
+  addSvgLabel("Male (54)", xM, yBase + (mobile ? 280 : 200));
+  addSvgLabel("Female (6)", xF, yBase + (mobile ? 280 : 200));
 
   simulation
     .force("x", d3.forceX((d) => (d.gender === "M" ? xM : xF)).strength(0.1))
@@ -752,7 +756,8 @@ function applyMotivationForces() {
 
   const xC = mobile ? width * 0.35 : width / 3;
   const xP = mobile ? width * 0.75 : (width / 3) * 2;
-  const yBase = mobile ? 450 : height / 2;
+  // MOVED UP: Was 450, now 280
+  const yBase = mobile ? 280 : height / 2;
 
   addSvgLabel("Organised Crime (46)", xC, yBase + (mobile ? 280 : 250));
   addSvgLabel("Personal/Other (14)", xP, yBase + (mobile ? 280 : 200));
@@ -791,10 +796,10 @@ function applyDistrictForces() {
   const cols = mobile ? 3 : 5;
   const colWidth = width / (cols + 1);
 
-  // Adjusted spacing to fit the larger mobile dots
-  const rowHeight = mobile ? 250 : 0;
-  const dotBaseY = mobile ? 180 : height / 2 - 50;
-  const labelBaseY = mobile ? 310 : height / 2 + 180;
+  // TIGHTENED & MOVED UP to eliminate the huge gap
+  const rowHeight = mobile ? 210 : 0;
+  const dotBaseY = mobile ? 120 : height / 2 - 50;
+  const labelBaseY = mobile ? 220 : height / 2 + 180;
 
   districts.forEach((dist, i) => {
     let xPos, yPos;
@@ -840,9 +845,8 @@ function applyDistrictForces() {
       d3
         .forceX((d) => {
           const i = districts.indexOf(d.district);
-          const xTarget = ((i % cols) + 1) * colWidth;
           return mobile
-            ? xTarget
+            ? ((i % cols) + 1) * colWidth
             : d3
                 .scalePoint()
                 .domain(districts)
@@ -905,10 +909,10 @@ function applyMonthForces() {
   const cols = mobile ? 3 : 6;
   const colWidth = width / (cols + 1);
 
-  // Adjusted spacing to fit the larger mobile dots
-  const rowHeight = mobile ? 250 : 350;
-  const dotBaseY = mobile ? 180 : 350;
-  const labelBaseY = mobile ? 310 : 490;
+  // TIGHTENED & MOVED UP
+  const rowHeight = mobile ? 210 : 350;
+  const dotBaseY = mobile ? 120 : 350;
+  const labelBaseY = mobile ? 220 : 490;
 
   months.forEach((month, i) => {
     const xPos = ((i % cols) + 1) * colWidth;
