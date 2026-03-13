@@ -879,51 +879,66 @@ function applyDistrictForces() {
       .alpha(1)
       .restart();
   } else {
-    // Desktop layout
+    // FIX: Desktop layout split into two rows of 5
+    const colsDesk = 5;
+    const colWidthDesk = width / (colsDesk + 1);
+
+    // Using the exact same height math as the Month view for consistency
+    const rowHeightDesk = height * 0.32;
+    const dotBaseYDesk = height * 0.4;
+
     districtsDesktop.forEach((dist, i) => {
-      let xPos = d3
-        .scalePoint()
-        .domain(districtsDesktop)
-        .range([width * 0.1, width * 0.9])(dist);
-      let yPos = height / 2 + 180;
+      let xPos = ((i % colsDesk) + 1) * colWidthDesk;
+      let labelOffset = 90;
+      let yPosLabel =
+        dotBaseYDesk + Math.floor(i / colsDesk) * rowHeightDesk + labelOffset;
+
       const group = d3.select("#labels");
       group
         .append("text")
         .attr("x", xPos)
-        .attr("y", yPos)
+        .attr("y", yPosLabel)
         .attr("text-anchor", "middle")
         .style("font-size", "22px")
         .style("font-weight", "bold")
+        .style("fill", "#1a1a1a")
         .text(dist.charAt(0).toUpperCase() + dist.slice(1));
       group
         .append("circle")
         .attr("cx", xPos)
-        .attr("cy", yPos + 35)
+        .attr("cy", yPosLabel + 35)
         .attr("r", 18)
         .style("fill", "#000");
       group
         .append("text")
         .attr("x", xPos)
-        .attr("y", yPos + 35)
+        .attr("y", yPosLabel + 35)
         .attr("dy", "0.35em")
         .attr("text-anchor", "middle")
         .style("fill", "#fff")
         .style("font-size", "16px")
         .text(districtCounts[dist] || 0);
     });
+
     simulation
       .force(
         "x",
         d3
-          .forceX((d) =>
-            d3
-              .scalePoint()
-              .domain(districtsDesktop)
-              .range([width * 0.1, width * 0.9])(d.district)
-          )
+          .forceX((d) => {
+            const i = districtsDesktop.indexOf(d.district);
+            return ((i % colsDesk) + 1) * colWidthDesk;
+          })
           .strength(0.8)
       )
-      .force("y", d3.forceY(height / 2 - 50).strength(0.8))
+      .force(
+        "y",
+        d3
+          .forceY((d) => {
+            const i = districtsDesktop.indexOf(d.district);
+            return dotBaseYDesk + Math.floor(i / colsDesk) * rowHeightDesk;
+          })
+          .strength(0.8)
+      )
       .alpha(1)
       .restart();
   }
@@ -967,13 +982,16 @@ function applyMonthForces() {
 
   const cols = isMobileView ? 3 : 6;
   const colWidth = width / (cols + 1);
-  const rowHeight = isMobileView ? 140 : 350;
-  const dotBaseY = isMobileView ? height * 0.22 : 350;
+
+  // FIX: Shifted desktop starting position down (from 0.30 to 0.40) to clear the text.
+  // Tightened desktop row gap slightly (from 0.35 to 0.32) so the bottom row stays visible.
+  const rowHeight = isMobileView ? 140 : height * 0.32;
+  const dotBaseY = isMobileView ? height * 0.22 : height * 0.4;
 
   months.forEach((month, i) => {
     const xPos = ((i % cols) + 1) * colWidth;
-    // MATCHING MOCKUP 6: Kept the black badges here
-    const labelOffset = isMobileView ? 50 : 140;
+
+    const labelOffset = isMobileView ? 50 : 90;
     const yPosLabel = dotBaseY + Math.floor(i / cols) * rowHeight + labelOffset;
 
     const group = d3.select("#labels");
@@ -1035,12 +1053,20 @@ document.getElementById("d3-legend").classList.add("active-legend");
 document.getElementById("d3-age-legend").classList.remove("active-legend");
 
 // 2. Check every single step as the user scrolls
-gsap.utils.toArray(".step").forEach((step) => {
+gsap.utils.toArray(".step").forEach((step, index) => {
   ScrollTrigger.create({
     trigger: step,
     start: "top center", // Triggers when the text hits the middle
     onEnter: () => handleStepEnter(step),
     onEnterBack: () => handleStepEnter(step), // Handles scrolling upwards
+    onLeaveBack: () => {
+      // FIX: If we scroll all the way back up past the first step, hide the text!
+      if (index === 0) {
+        document
+          .querySelectorAll(".step .content")
+          .forEach((el) => el.classList.remove("active"));
+      }
+    },
   });
 });
 
@@ -1074,3 +1100,13 @@ function handleStepEnter(step) {
     document.getElementById("d3-legend").classList.add("active-legend");
   }
 }
+
+// 4. MASTER LEGEND VISIBILITY SWITCH
+// Turns the legends on when you reach the D3 section,
+// and hides them if you scroll back up to the intro canvas.
+ScrollTrigger.create({
+  trigger: ".d3-scrollytelling",
+  start: "top center",
+  onEnter: () => document.body.classList.add("show-legends"),
+  onLeaveBack: () => document.body.classList.remove("show-legends"),
+});
