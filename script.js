@@ -49,10 +49,17 @@ function renderIntro() {
 // 2. D3.JS DATA VISUALIZATION
 // ==========================================
 const svg = d3.select("#visual-stage");
-const width = 1920;
-const height = 1080;
-// Make circles almost twice as large on mobile devices!
-const radius = window.innerWidth < 768 ? 32 : 18;
+
+// 1. TRUE RESPONSIVE: Measure the user's exact screen dimensions
+const width = window.innerWidth;
+const height = window.innerHeight;
+const isMobileView = width < 768;
+
+// 2. Normal sizes! Because the canvas isn't shrunk, we don't need giant dots
+const radius = isMobileView ? 11 : 18;
+
+// 3. Set the SVG to match the screen perfectly
+svg.attr("width", width).attr("height", height);
 
 // Colors matching your palette
 const COLOR_MALE = "#3E5C76";
@@ -644,20 +651,19 @@ function initD3Physics(data) {
 }
 
 /* ========================================= */
-/* LABEL HELPER FUNCTIONS (RESTORED)         */
+/* LABEL HELPER FUNCTIONS                    */
 /* ========================================= */
 function clearLabels() {
   d3.select("#labels").selectAll("*").remove();
 }
 
 function addSvgLabel(text, x, y) {
-  const mobile = window.innerWidth < 768;
   d3.select("#labels")
     .append("text")
     .attr("x", x)
     .attr("y", y)
     .attr("text-anchor", "middle")
-    .style("font-size", mobile ? "45px" : "26px") /* MASSIVE mobile font */
+    .style("font-size", isMobileView ? "18px" : "26px") // Normal readable font sizes!
     .style("font-weight", "bold")
     .style("fill", "#1a1a1a")
     .text(text);
@@ -666,7 +672,11 @@ function addSvgLabel(text, x, y) {
 function applyTotalForces() {
   clearLabels();
   restoreGenderView();
-  addSvgLabel("60 Lives Lost", width / 2, height / 2 + 200);
+  addSvgLabel(
+    "60 Lives Lost",
+    width / 2,
+    height / 2 + (isMobileView ? 100 : 200)
+  );
   simulation
     .force("x", d3.forceX(width / 2).strength(0.08))
     .force("y", d3.forceY(height / 2).strength(0.08))
@@ -674,31 +684,29 @@ function applyTotalForces() {
     .restart();
 }
 
-// NEW: UTILITY FUNCTION TO RESTORE GENDER VIEW
 function restoreGenderView() {
   d3.selectAll("circle")
     .transition()
     .duration(500)
     .attr("fill", (d) => (d.gender === "M" ? COLOR_MALE : COLOR_FEMALE));
-
-  // Uses new active-legend class
   document.getElementById("d3-legend").classList.add("active-legend");
   document.getElementById("d3-age-legend").classList.remove("active-legend");
 }
 
 function applyAgeForces() {
   clearLabels();
-
   d3.selectAll("circle")
     .transition()
     .duration(500)
     .attr("fill", (d) => ageColorScale(d.age));
-
-  // Swaps the active-legend class
   document.getElementById("d3-legend").classList.remove("active-legend");
   document.getElementById("d3-age-legend").classList.add("active-legend");
 
-  let ageScale = d3.scaleLinear().domain([6, 68]).range([300, 1600]);
+  // Dynamically uses 10% to 90% of the screen width!
+  let ageScale = d3
+    .scaleLinear()
+    .domain([6, 68])
+    .range([width * 0.1, width * 0.9]);
   simulation
     .force("x", d3.forceX((d) => ageScale(d.age)).strength(0.15))
     .force("y", d3.forceY(height / 2).strength(0.05))
@@ -707,45 +715,19 @@ function applyAgeForces() {
 }
 
 /* ========================================= */
-/* ADAPTIVE D3 FORCE FUNCTIONS               */
+/* TRUE RESPONSIVE D3 FORCE FUNCTIONS        */
 /* ========================================= */
-
-/* ========================================= */
-/* ADAPTIVE D3 FORCE FUNCTIONS - FIXED       */
-/* ========================================= */
-
-// This helper checks the width every time a scroll happens
-
-/* ========================================= */
-/* ADAPTIVE D3 FORCE FUNCTIONS - RESIZED     */
-/* ========================================= */
-
-/* ========================================= */
-/* ADAPTIVE D3 FORCE FUNCTIONS - RESIZED     */
-/* ========================================= */
-
-/* ========================================= */
-/* ADAPTIVE D3 FORCE FUNCTIONS - RESIZED     */
-/* ========================================= */
-
-/* ========================================= */
-/* ADAPTIVE D3 FORCE FUNCTIONS - RESIZED     */
-/* ========================================= */
-
-const getMobileState = () => window.innerWidth < 768;
 
 function applyGenderForces() {
   clearLabels();
   restoreGenderView();
-  const mobile = getMobileState();
 
-  const xM = mobile ? width * 0.35 : width / 3;
-  const xF = mobile ? width * 0.75 : (width / 3) * 2;
-  const yBase = mobile ? 280 : height / 2;
+  const xM = isMobileView ? width * 0.35 : width / 3;
+  const xF = isMobileView ? width * 0.75 : (width / 3) * 2;
+  const yBase = isMobileView ? height * 0.4 : height / 2;
 
-  // Pushed down an extra 70px to clear the massive new text
-  addSvgLabel("Male (54)", xM, yBase + (mobile ? 350 : 200));
-  addSvgLabel("Female (6)", xF, yBase + (mobile ? 350 : 200));
+  addSvgLabel("Male (54)", xM, yBase + (isMobileView ? 100 : 200));
+  addSvgLabel("Female (6)", xF, yBase + (isMobileView ? 100 : 200));
 
   simulation
     .force("x", d3.forceX((d) => (d.gender === "M" ? xM : xF)).strength(0.1))
@@ -757,15 +739,13 @@ function applyGenderForces() {
 function applyMotivationForces() {
   clearLabels();
   restoreGenderView();
-  const mobile = getMobileState();
 
-  const xC = mobile ? width * 0.35 : width / 3;
-  const xP = mobile ? width * 0.75 : (width / 3) * 2;
-  const yBase = mobile ? 280 : height / 2;
+  const xC = isMobileView ? width * 0.35 : width / 3;
+  const xP = isMobileView ? width * 0.75 : (width / 3) * 2;
+  const yBase = isMobileView ? height * 0.4 : height / 2;
 
-  // Pushed down an extra 70px to clear the massive new text
-  addSvgLabel("Organised Crime (46)", xC, yBase + (mobile ? 350 : 250));
-  addSvgLabel("Personal/Other (14)", xP, yBase + (mobile ? 350 : 200));
+  addSvgLabel("Organised Crime (46)", xC, yBase + (isMobileView ? 110 : 250));
+  addSvgLabel("Personal/Other (14)", xP, yBase + (isMobileView ? 110 : 200));
 
   simulation
     .force(
@@ -797,32 +777,29 @@ function applyDistrictForces() {
     (d) => (districtCounts[d.district] = (districtCounts[d.district] || 0) + 1)
   );
 
-  const mobile = getMobileState();
-  const cols = mobile ? 3 : 5;
+  const cols = isMobileView ? 3 : 5;
   const colWidth = width / (cols + 1);
 
-  // SPREAD OUT: Increased rowHeight and dynamically scaled labels/badges
-  const rowHeight = mobile ? 250 : 0;
-  const dotBaseY = mobile ? 130 : height / 2 - 50;
-  const labelBaseY = mobile ? 260 : height / 2 + 180;
+  // Normal pixel spacing, using percentage of screen height for perfect placement
+  const rowHeight = isMobileView ? 120 : 0;
+  const dotBaseY = isMobileView ? height * 0.25 : height / 2 - 50;
+  const labelBaseY = isMobileView ? height * 0.25 + 60 : height / 2 + 180;
 
-  const labelSize = mobile ? "42px" : "22px";
-  const badgeR = mobile ? 32 : 18;
-  const badgeOffset = mobile ? 55 : 35;
-  const numSize = mobile ? "30px" : "16px";
+  const labelSize = isMobileView ? "14px" : "22px";
+  const badgeR = isMobileView ? 12 : 18;
+  const badgeOffset = isMobileView ? 20 : 35;
+  const numSize = isMobileView ? "11px" : "16px";
 
   districts.forEach((dist, i) => {
-    let xPos, yPos;
-    if (mobile) {
-      xPos = ((i % cols) + 1) * colWidth;
-      yPos = Math.floor(i / cols) * rowHeight + labelBaseY;
-    } else {
-      xPos = d3
-        .scalePoint()
-        .domain(districts)
-        .range([150, width - 150])(dist);
-      yPos = labelBaseY;
-    }
+    let xPos = isMobileView
+      ? ((i % cols) + 1) * colWidth
+      : d3
+          .scalePoint()
+          .domain(districts)
+          .range([width * 0.1, width * 0.9])(dist);
+    let yPos = isMobileView
+      ? Math.floor(i / cols) * rowHeight + labelBaseY
+      : labelBaseY;
 
     const group = d3.select("#labels");
     group
@@ -856,12 +833,12 @@ function applyDistrictForces() {
       d3
         .forceX((d) => {
           const i = districts.indexOf(d.district);
-          return mobile
+          return isMobileView
             ? ((i % cols) + 1) * colWidth
             : d3
                 .scalePoint()
                 .domain(districts)
-                .range([150, width - 150])(d.district);
+                .range([width * 0.1, width * 0.9])(d.district);
         })
         .strength(0.8)
     )
@@ -870,7 +847,7 @@ function applyDistrictForces() {
       d3
         .forceY((d) => {
           const i = districts.indexOf(d.district);
-          return mobile
+          return isMobileView
             ? Math.floor(i / cols) * rowHeight + dotBaseY
             : dotBaseY;
         })
@@ -916,19 +893,17 @@ function applyMonthForces() {
     (d) => (monthCounts[d.month] = (monthCounts[d.month] || 0) + 1)
   );
 
-  const mobile = getMobileState();
-  const cols = mobile ? 3 : 6;
+  const cols = isMobileView ? 3 : 6;
   const colWidth = width / (cols + 1);
 
-  // SPREAD OUT: Using the exact same dynamic math as the District grid
-  const rowHeight = mobile ? 250 : 350;
-  const dotBaseY = mobile ? 130 : 350;
-  const labelBaseY = mobile ? 260 : 490;
+  const rowHeight = isMobileView ? 110 : 350;
+  const dotBaseY = isMobileView ? height * 0.25 : 350;
+  const labelBaseY = isMobileView ? height * 0.25 + 60 : 490;
 
-  const labelSize = mobile ? "42px" : "22px";
-  const badgeR = mobile ? 32 : 18;
-  const badgeOffset = mobile ? 55 : 35;
-  const numSize = mobile ? "30px" : "16px";
+  const labelSize = isMobileView ? "14px" : "22px";
+  const badgeR = isMobileView ? 12 : 18;
+  const badgeOffset = isMobileView ? 20 : 35;
+  const numSize = isMobileView ? "11px" : "16px";
 
   months.forEach((month, i) => {
     const xPos = ((i % cols) + 1) * colWidth;
