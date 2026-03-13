@@ -663,7 +663,8 @@ function addSvgLabel(text, x, y) {
     .attr("x", x)
     .attr("y", y)
     .attr("text-anchor", "middle")
-    .style("font-size", isMobileView ? "18px" : "26px") // Normal readable font sizes!
+    // Increased mobile font size for better readability
+    .style("font-size", isMobileView ? "24px" : "26px")
     .style("font-weight", "bold")
     .style("fill", "#1a1a1a")
     .text(text);
@@ -672,15 +673,12 @@ function addSvgLabel(text, x, y) {
 function applyTotalForces() {
   clearLabels();
   restoreGenderView();
-  // Pushed the "60 Lives Lost" label further down on mobile
-  addSvgLabel(
-    "60 Lives Lost",
-    width / 2,
-    height / 2 + (isMobileView ? 140 : 200)
-  );
+  // Shifted the main cluster down to 55% of the screen height
+  const yCenter = isMobileView ? height * 0.55 : height / 2;
+  addSvgLabel("60 Lives Lost", width / 2, yCenter + (isMobileView ? 160 : 200));
   simulation
     .force("x", d3.forceX(width / 2).strength(0.08))
-    .force("y", d3.forceY(height / 2).strength(0.08))
+    .force("y", d3.forceY(yCenter).strength(0.08))
     .alpha(1)
     .restart();
 }
@@ -703,15 +701,15 @@ function applyAgeForces() {
   document.getElementById("d3-legend").classList.remove("active-legend");
   document.getElementById("d3-age-legend").classList.add("active-legend");
 
-  // DESKTOP uses X-axis (horizontal). MOBILE uses Y-axis (vertical 90-degree turn!)
   let ageScaleX = d3
     .scaleLinear()
     .domain([6, 68])
     .range([width * 0.1, width * 0.9]);
+  // Shifted the entire age waterfall down (starts at 35% height instead of 25%)
   let ageScaleY = d3
     .scaleLinear()
     .domain([6, 68])
-    .range([height * 0.25, height * 0.85]);
+    .range([height * 0.35, height * 0.9]);
 
   simulation
     .force(
@@ -738,15 +736,14 @@ function applyGenderForces() {
   clearLabels();
   restoreGenderView();
 
-  // Desktop: Side-by-Side. Mobile: Top and Bottom Stack
   const xM = isMobileView ? width / 2 : width / 3;
   const xF = isMobileView ? width / 2 : (width / 3) * 2;
-  const yM = isMobileView ? height * 0.35 : height / 2;
-  const yF = isMobileView ? height * 0.75 : height / 2;
+  // Shifted both groups down deeper into the screen
+  const yM = isMobileView ? height * 0.42 : height / 2;
+  const yF = isMobileView ? height * 0.8 : height / 2;
 
-  // Custom offsets based on cluster size so text doesn't overlap dots
-  addSvgLabel("Male (54)", xM, yM + (isMobileView ? 110 : 200));
-  addSvgLabel("Female (6)", xF, yF + (isMobileView ? 50 : 200));
+  addSvgLabel("Male (54)", xM, yM + (isMobileView ? 120 : 200));
+  addSvgLabel("Female (6)", xF, yF + (isMobileView ? 60 : 200));
 
   simulation
     .force("x", d3.forceX((d) => (d.gender === "M" ? xM : xF)).strength(0.1))
@@ -759,14 +756,14 @@ function applyMotivationForces() {
   clearLabels();
   restoreGenderView();
 
-  // Desktop: Side-by-Side. Mobile: Top and Bottom Stack
   const xC = isMobileView ? width / 2 : width / 3;
   const xP = isMobileView ? width / 2 : (width / 3) * 2;
-  const yC = isMobileView ? height * 0.35 : height / 2;
-  const yP = isMobileView ? height * 0.75 : height / 2;
+  // Shifted both groups down deeper into the screen
+  const yC = isMobileView ? height * 0.42 : height / 2;
+  const yP = isMobileView ? height * 0.8 : height / 2;
 
-  addSvgLabel("Organised Crime (46)", xC, yC + (isMobileView ? 110 : 250));
-  addSvgLabel("Personal/Other (14)", xP, yP + (isMobileView ? 70 : 200));
+  addSvgLabel("Organised Crime (46)", xC, yC + (isMobileView ? 130 : 250));
+  addSvgLabel("Personal/Other (14)", xP, yP + (isMobileView ? 80 : 200));
 
   simulation
     .force(
@@ -804,15 +801,17 @@ function applyDistrictForces() {
   const cols = isMobileView ? 3 : 5;
   const colWidth = width / (cols + 1);
 
-  // SHIFTED DOWN: dotBaseY is now 38% down the screen instead of 25%
-  const rowHeight = isMobileView ? 100 : 0;
-  const dotBaseY = isMobileView ? height * 0.38 : height / 2 - 50;
-  const labelBaseY = isMobileView ? height * 0.38 + 45 : height / 2 + 180;
+  // 1. Increased row spacing (130 instead of 100)
+  // 2. Shifted entire grid down (starts at 45% screen height instead of 38%)
+  const rowHeight = isMobileView ? 130 : 0;
+  const dotBaseY = isMobileView ? height * 0.45 : height / 2 - 50;
+  const labelBaseY = isMobileView ? height * 0.45 + 45 : height / 2 + 180;
 
-  const labelSize = isMobileView ? "14px" : "22px";
-  const badgeR = isMobileView ? 12 : 18;
-  const badgeOffset = isMobileView ? 20 : 35;
-  const numSize = isMobileView ? "11px" : "16px";
+  // Enlarged grid labels and number badges
+  const labelSize = isMobileView ? "16px" : "22px";
+  const badgeR = isMobileView ? 14 : 18;
+  const badgeOffset = isMobileView ? 24 : 35;
+  const numSize = isMobileView ? "13px" : "16px";
 
   districts.forEach((dist, i) => {
     let xPos = isMobileView
@@ -920,15 +919,17 @@ function applyMonthForces() {
   const cols = isMobileView ? 3 : 6;
   const colWidth = width / (cols + 1);
 
-  // SHIFTED DOWN: Exactly matching the District logic
-  const rowHeight = isMobileView ? 100 : 350;
-  const dotBaseY = isMobileView ? height * 0.38 : 350;
-  const labelBaseY = isMobileView ? height * 0.38 + 45 : 490;
+  // 1. Dramatically increased row spacing (135 instead of 100)
+  // 2. Shifted entire grid down to safely clear the two-line text box
+  const rowHeight = isMobileView ? 135 : 350;
+  const dotBaseY = isMobileView ? height * 0.45 : 350;
+  const labelBaseY = isMobileView ? height * 0.45 + 45 : 490;
 
-  const labelSize = isMobileView ? "14px" : "22px";
-  const badgeR = isMobileView ? 12 : 18;
-  const badgeOffset = isMobileView ? 20 : 35;
-  const numSize = isMobileView ? "11px" : "16px";
+  // Enlarged grid labels and number badges
+  const labelSize = isMobileView ? "16px" : "22px";
+  const badgeR = isMobileView ? 14 : 18;
+  const badgeOffset = isMobileView ? 24 : 35;
+  const numSize = isMobileView ? "13px" : "16px";
 
   months.forEach((month, i) => {
     const xPos = ((i % cols) + 1) * colWidth;
