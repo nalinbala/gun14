@@ -882,11 +882,10 @@ div[id^="g-"] {
 
   /* 1. Optimize the Scrollytelling Text Area */
   .content {
-    width: 95vw !important; /* Widens text area to reduce height */
+    width: 95vw !important;
     max-width: 95vw !important;
-    top: 150px !important; /* Moves down to avoid crowding the legend */
+    top: 100px !important; /* Pulled up to clear space for bubbles */
   }
-
   .content h1,
   .content h2 {
     line-height: 1.1 !important; /* Decreased line height */

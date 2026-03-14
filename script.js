@@ -53,8 +53,8 @@ const width = window.innerWidth;
 const height = window.innerHeight;
 const isMobileView = width < 768;
 
-// Increased dot size drastically to match mockup
-const radius = isMobileView ? 12 : 18;
+// Slightly reduced dot size to prevent crowding
+const radius = isMobileView ? 9 : 18;
 svg.attr("width", width).attr("height", height);
 
 // ==========================================
@@ -635,7 +635,7 @@ function applyTotalForces() {
   restoreGenderView();
 
   // MATCHING MOCKUP 1: Tighter cluster, bold label right below it
-  const yCenter = isMobileView ? height * 0.45 : height / 2;
+  const yCenter = isMobileView ? height * 0.55 : height / 2;
 
   if (isMobileView) {
     addSvgLabel("60 Lives Lost", width / 2, yCenter + 150, "20px");
@@ -748,8 +748,8 @@ function applyGenderForces() {
 
   const xM = isMobileView ? width / 2 : width / 3;
   const xF = isMobileView ? width / 2 : (width / 3) * 2;
-  const yM = isMobileView ? height * 0.35 : height / 2;
-  const yF = isMobileView ? height * 0.7 : height / 2;
+  const yM = isMobileView ? height * 0.45 : height / 2;
+  const yF = isMobileView ? height * 0.75 : height / 2;
 
   if (isMobileView) {
     addSvgLabel("Male (54)", xM, yM + 140, "20px");
@@ -772,9 +772,8 @@ function applyMotivationForces() {
 
   const xC = isMobileView ? width / 2 : width / 3;
   const xP = isMobileView ? width / 2 : (width / 3) * 2;
-  const yC = isMobileView ? height * 0.35 : height / 2;
-  const yP = isMobileView ? height * 0.7 : height / 2;
-
+  const yC = isMobileView ? height * 0.45 : height / 2;
+  const yP = isMobileView ? height * 0.75 : height / 2;
   if (isMobileView) {
     addSvgLabel("Organised Crime (46)", xC, yC + 130, "20px");
     addSvgLabel("Personal/Other (14)", xP, yP + 80, "20px");
@@ -821,8 +820,8 @@ function applyDistrictForces() {
     // MOBILE VIEW: 3-Column Centered Grid
     const cols = 3;
     // MASSIVE FIX: Increased rowHeight and dotBaseY to prevent large clusters from overlapping
-    const rowHeight = 170;
-    const dotBaseY = 160;
+    const rowHeight = 150;
+    const dotBaseY = 240;
 
     districtsDesktop.forEach((dist, i) => {
       const row = Math.floor(i / cols);
