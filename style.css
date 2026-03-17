@@ -265,7 +265,7 @@ main.d3-scrollytelling {
 #d3-legend,
 #d3-age-legend {
   position: fixed;
-  top: 85px;
+  top: 65px; /* Moved up to sit just 5px below the 60px masthead */
   right: 5vw;
   z-index: 20;
   opacity: 0;
