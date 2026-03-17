@@ -963,6 +963,174 @@ function applyDistrictForces() {
   }
 }
 
+function applyMonthForces() {
+  clearLabels();
+  restoreGenderView();
+
+  const monthsTimeline = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  // Count incidents per month
+  const monthCounts = {};
+  nodes.forEach(
+    (d) => (monthCounts[d.month] = (monthCounts[d.month] || 0) + 1)
+  );
+
+  if (isMobileView) {
+    // MOBILE VIEW: 3 columns x 4 rows
+    const cols = 3;
+    const rowHeight = 125;
+    const dotBaseY = 220; // Pushed down to clear the top text
+
+    monthsTimeline.forEach((month, i) => {
+      const row = Math.floor(i / cols);
+      const col = i % cols;
+
+      const dynamicColWidth = width / (cols + 1);
+      const xPos = (col + 1) * dynamicColWidth;
+
+      // Position the label below each month's cluster
+      const yPosLabel = dotBaseY + row * rowHeight + 55;
+
+      const group = d3.select("#labels");
+
+      // Abbreviate month names for mobile to prevent overlap (Jan, Feb, etc.)
+      group
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", yPosLabel)
+        .attr("text-anchor", "middle")
+        .style("font-size", "14px")
+        .style("font-weight", "bold")
+        .style("fill", "#1a1a1a")
+        .text(month.substring(0, 3));
+
+      // Black badge background
+      group
+        .append("circle")
+        .attr("cx", xPos)
+        .attr("cy", yPosLabel + 22)
+        .attr("r", 12)
+        .style("fill", "#000");
+
+      // Number count inside badge
+      group
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", yPosLabel + 22)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "middle")
+        .style("fill", "#fff")
+        .style("font-size", "12px")
+        .text(monthCounts[month] || 0);
+    });
+
+    // Apply the physics forces to move the bubbles to their grid spots
+    simulation
+      .force(
+        "x",
+        d3
+          .forceX((d) => {
+            const i = monthsTimeline.indexOf(d.month);
+            const col = i % cols;
+            return (col + 1) * (width / (cols + 1));
+          })
+          .strength(0.8)
+      )
+      .force(
+        "y",
+        d3
+          .forceY((d) => {
+            const i = monthsTimeline.indexOf(d.month);
+            const row = Math.floor(i / cols);
+            return dotBaseY + row * rowHeight;
+          })
+          .strength(0.8)
+      )
+      .alpha(1)
+      .restart();
+  } else {
+    // DESKTOP VIEW: 6 columns x 2 rows
+    const colsDesk = 6;
+    const colWidthDesk = width / (colsDesk + 1);
+    const rowHeightDesk = height * 0.35;
+    const dotBaseYDesk = height * 0.35;
+
+    monthsTimeline.forEach((month, i) => {
+      let xPos = ((i % colsDesk) + 1) * colWidthDesk;
+      let yPosLabel =
+        dotBaseYDesk + Math.floor(i / colsDesk) * rowHeightDesk + 80;
+
+      const group = d3.select("#labels");
+
+      // Full month name for desktop
+      group
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", yPosLabel)
+        .attr("text-anchor", "middle")
+        .style("font-size", "18px")
+        .style("font-weight", "bold")
+        .style("fill", "#1a1a1a")
+        .text(month);
+
+      // Black badge background
+      group
+        .append("circle")
+        .attr("cx", xPos)
+        .attr("cy", yPosLabel + 30)
+        .attr("r", 16)
+        .style("fill", "#000");
+
+      // Number count inside badge
+      group
+        .append("text")
+        .attr("x", xPos)
+        .attr("y", yPosLabel + 30)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "middle")
+        .style("fill", "#fff")
+        .style("font-size", "14px")
+        .text(monthCounts[month] || 0);
+    });
+
+    // Apply the physics forces
+    simulation
+      .force(
+        "x",
+        d3
+          .forceX((d) => {
+            const i = monthsTimeline.indexOf(d.month);
+            return ((i % colsDesk) + 1) * colWidthDesk;
+          })
+          .strength(0.8)
+      )
+      .force(
+        "y",
+        d3
+          .forceY((d) => {
+            const i = monthsTimeline.indexOf(d.month);
+            return dotBaseYDesk + Math.floor(i / colsDesk) * rowHeightDesk;
+          })
+          .strength(0.8)
+      )
+      .alpha(1)
+      .restart();
+  }
+}
+
 /* ========================================= */
 /* STRICT LEGEND SWAPPER                     */
 /* ========================================= */
