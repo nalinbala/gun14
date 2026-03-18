@@ -967,28 +967,28 @@ div[id^="g-"] {
   stroke: currentColor;
 }
 
-/* SPECIFIC OVERRIDES FOR MOBILE LANDSCAPE */
+/* ISOLATED MOBILE LANDSCAPE OVERRIDES */
 @media (max-width: 950px) and (orientation: landscape) {
+  /* 1. Move the HTML Heading/Text to the very top */
   .content {
-    top: 65px !important; /* Pulls heading up to the top */
+    top: 65px !important;
   }
-
+  .content h1,
   .content h2 {
-    font-size: 1.4rem !important;
+    font-size: 1.3rem !important;
     margin-bottom: 2px !important;
   }
-
   .content p {
     font-size: 0.9rem !important;
     line-height: 1.2 !important;
   }
 
+  /* 2. Move the Gender Legend up into the corner */
   #d3-legend,
   #d3-age-legend {
-    top: 65px !important; /* Moves Gender Key up to align with heading */
+    top: 70px !important;
     right: 2vw !important;
   }
-
   .legend-item {
     font-size: 13px !important;
   }
