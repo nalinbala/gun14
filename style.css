@@ -1048,3 +1048,20 @@ div[id^="g-"] {
     right: 20px !important;
   }
 }
+
+/* --- MOBILE LANDSCAPE KILL SWITCH --- */
+@media (max-width: 950px) and (orientation: landscape) {
+  /* Hide the bubbles, labels, and legends */
+  #visual-stage,
+  #d3-legend,
+  #d3-age-legend {
+    display: none !important;
+  }
+
+  /* Center the HTML text since bubbles are gone */
+  .content {
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90vw !important;
+  }
+}

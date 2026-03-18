@@ -52,13 +52,13 @@ const svg = d3.select("#visual-stage");
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-// 1. Set mobile status first
+// 1. Define mobile first
 const isMobileView = width < 768;
 
-// 2. Determine if it is landscape
+// 2. Define landscape based on mobile
 const isLandscape = isMobileView && width > height;
 
-// 3. Set radius (7 for landscape)
+// 3. Set radius
 const radius = isLandscape ? 7 : isMobileView ? 9 : 18;
 
 svg.attr("width", width).attr("height", height);
@@ -637,6 +637,8 @@ function addSvgLabel(text, x, y, size = "20px") {
 /* ========================================= */
 
 function applyTotalForces() {
+  if (isLandscape) return; // <--- ADD THIS LINE
+  clearLabels();
   clearLabels();
   restoreGenderView();
 
@@ -775,6 +777,8 @@ function applyAgeForces() {
 }
 
 function applyGenderForces() {
+  if (isLandscape) return; // <--- ADD THIS LINE
+  clearLabels();
   clearLabels();
   restoreGenderView();
 
@@ -799,6 +803,8 @@ function applyGenderForces() {
 }
 
 function applyMotivationForces() {
+  if (isLandscape) return; // <--- ADD THIS LINE
+  clearLabels();
   clearLabels();
   restoreGenderView();
 
@@ -827,6 +833,8 @@ function applyMotivationForces() {
     .restart();
 }
 function applyDistrictForces() {
+  if (isLandscape) return; // <--- ADD THIS LINE
+  clearLabels();
   clearLabels();
   restoreGenderView();
 
@@ -996,6 +1004,8 @@ function applyDistrictForces() {
 }
 
 function applyMonthForces() {
+  if (isLandscape) return; // <--- ADD THIS LINE
+  clearLabels();
   clearLabels();
   restoreGenderView();
 
