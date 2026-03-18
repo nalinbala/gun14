@@ -648,22 +648,62 @@ function applyTotalForces() {
     : height / 2;
 
   if (isLandscape) {
-    // 1. Set smaller radius instantly
-    nodeElements.attr("r", radius);
+    // 1. Stop the physics bounce entirely for this perfect geometric layout
+    simulation.stop();
 
-    // 2. Add the label exactly where you want it
-    addSvgLabel("60 Lives Lost", xCenter, yCenter + 75, "16px");
+    // 2. Set the correct smaller radius
+    nodeElements.transition().duration(500).attr("r", radius);
 
-    // 3. Force positions to be instant (No Animation)
-    simulation.force("x", d3.forceX(xCenter).strength(1));
-    simulation.force("y", d3.forceY(yCenter).strength(1));
-    simulation.alpha(1).tick(100); // Pre-calculates the cluster
-    simulation.stop(); // Stops the physics bounce
+    // 3. Add the label safely below the cluster
+    addSvgLabel("60 Lives Lost", xCenter, yCenter + 95, "16px");
 
-    // Snaps circles to final positions immediately
-    nodeElements.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+    // 4. Generate perfect honeycomb coordinates matching the image structure
+    const rowCounts = [5, 6, 7, 8, 9, 8, 7, 6, 4];
+    const coords = [];
+
+    // Calculate tight spacing, factoring in your 1.5px white stroke
+    const dotSpacing = radius * 2 + 1.5;
+    const dx = dotSpacing;
+    const dy = (dotSpacing * Math.sqrt(3)) / 2;
+
+    rowCounts.forEach((count, r) => {
+      const startX = xCenter - ((count - 1) * dx) / 2;
+      const y = yCenter + (r - 4) * dy; // Center around the 5th row (index 4)
+      for (let c = 0; c < count; c++) {
+        coords.push({ x: startX + c * dx, y: y });
+      }
+    });
+
+    // 5. Target the exact right-edge positions for the 6 Female dots
+    // These indices map precisely to the orange dots in your provided image
+    const femaleIndices = [25, 33, 34, 41, 42, 49];
+    const femaleCoords = femaleIndices.map((i) => coords[i]);
+    const maleCoords = coords.filter((_, i) => !femaleIndices.includes(i));
+
+    // 6. Assign target coordinates based on the data's gender property
+    let mCount = 0;
+    let fCount = 0;
+
+    nodes.forEach((d) => {
+      if (d.gender === "F") {
+        d.targetX = femaleCoords[fCount].x;
+        d.targetY = femaleCoords[fCount].y;
+        fCount++;
+      } else {
+        d.targetX = maleCoords[mCount].x;
+        d.targetY = maleCoords[mCount].y;
+        mCount++;
+      }
+    });
+
+    // 7. Animate dots smoothly to their new mathematical positions
+    nodeElements
+      .transition()
+      .duration(800)
+      .attr("cx", (d) => (d.x = d.targetX)) // Also updates physics 'x' so future steps start from here
+      .attr("cy", (d) => (d.y = d.targetY));
   } else {
-    // Standard logic for Portrait and Desktop (Animation kept here)
+    // Standard organic physics logic for Portrait and Desktop
     if (isMobileView) {
       addSvgLabel("60 Lives Lost", xCenter, yCenter + 150, "20px");
     } else {
