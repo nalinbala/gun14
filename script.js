@@ -46,24 +46,6 @@ function renderIntro() {
 }
 
 // ==========================================
-// RESPONSIVE DIMENSIONS & DOT SIZES
-// ==========================================
-const svg = d3.select("#visual-stage");
-const width = window.innerWidth;
-const height = window.innerHeight;
-
-// 1. Set mobile status first
-const isMobileView = width < 768;
-
-// 2. Determine if it is landscape
-const isLandscape = isMobileView && width > height;
-
-// 3. Set radius (7 for landscape)
-const radius = isLandscape ? 7 : isMobileView ? 9 : 18;
-
-svg.attr("width", width).attr("height", height);
-
-// ==========================================
 // RESTORED COLORS AND SCALES
 // ==========================================
 const COLOR_MALE = "#3e5c76";
