@@ -52,13 +52,13 @@ const svg = d3.select("#visual-stage");
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-// 1. Define mobile first
+// 1. Set mobile status first
 const isMobileView = width < 768;
 
-// 2. Define landscape based on mobile
+// 2. Determine if it is landscape
 const isLandscape = isMobileView && width > height;
 
-// 3. Set specific radius: 7 for landscape, 9 for portrait, 18 for desktop
+// 3. Set radius (7 for landscape)
 const radius = isLandscape ? 7 : isMobileView ? 9 : 18;
 
 svg.attr("width", width).attr("height", height);
@@ -640,29 +640,46 @@ function applyTotalForces() {
   clearLabels();
   restoreGenderView();
 
-  // Set specific centers for different devices
-  let xCenter = width / 2;
-  let yCenter = height / 2;
+  const xCenter = width / 2;
+  const yCenter = isLandscape
+    ? height * 0.58
+    : isMobileView
+    ? height * 0.55
+    : height / 2;
 
   if (isLandscape) {
-    yCenter = height * 0.58; // Lower center to avoid HTML text at top
+    // 1. Set smaller radius instantly
+    nodeElements.attr("r", radius);
+
+    // 2. Add the label exactly where you want it
     addSvgLabel("60 Lives Lost", xCenter, yCenter + 75, "16px");
-  } else if (isMobileView) {
-    yCenter = height * 0.55;
-    addSvgLabel("60 Lives Lost", xCenter, yCenter + 150, "20px");
+
+    // 3. Force positions to be instant (No Animation)
+    simulation.force("x", d3.forceX(xCenter).strength(1));
+    simulation.force("y", d3.forceY(yCenter).strength(1));
+    simulation.alpha(1).tick(100); // Pre-calculates the cluster
+    simulation.stop(); // Stops the physics bounce
+
+    // Snaps circles to final positions immediately
+    nodeElements.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
   } else {
-    addSvgLabel("60 Lives Lost", xCenter, yCenter + 200, "26px");
+    // Standard logic for Portrait and Desktop (Animation kept here)
+    if (isMobileView) {
+      addSvgLabel("60 Lives Lost", xCenter, yCenter + 150, "20px");
+    } else {
+      addSvgLabel("60 Lives Lost", xCenter, yCenter + 200, "26px");
+    }
+
+    simulation.alpha(1).restart();
+    simulation.force(
+      "x",
+      d3.forceX(xCenter).strength(isMobileView ? 0.12 : 0.08)
+    );
+    simulation.force(
+      "y",
+      d3.forceY(yCenter).strength(isMobileView ? 0.12 : 0.08)
+    );
   }
-
-  // Update simulation physics for the smaller landscape dots
-  simulation.force("collide").radius(radius + 1.5);
-  nodeElements.transition().duration(500).attr("r", radius);
-
-  simulation
-    .force("x", d3.forceX(xCenter).strength(isLandscape ? 0.2 : 0.1))
-    .force("y", d3.forceY(yCenter).strength(isLandscape ? 0.2 : 0.1))
-    .alpha(1)
-    .restart();
 }
 
 function restoreGenderView() {

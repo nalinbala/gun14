@@ -1028,3 +1028,23 @@ div[id^="g-"] {
     right: 3vw !important;
   }
 }
+
+@media (max-width: 950px) and (orientation: landscape) {
+  /* Pulls the HTML heading to the top */
+  .content {
+    top: 65px !important;
+  }
+  .content h1 {
+    font-size: 1.3rem !important;
+  }
+  .content p {
+    font-size: 0.85rem !important;
+    line-height: 1.1 !important;
+  }
+
+  /* Pulls the Gender key up to the top right */
+  #d3-legend {
+    top: 70px !important;
+    right: 20px !important;
+  }
+}
