@@ -166,16 +166,32 @@ body {
 }
 
 /* Intro Typography */
+/* --- UPDATED HEADING POSITION --- */
+/* --- UPDATED HEADING POSITION --- */
 .main-heading {
+  position: relative;
   text-align: center;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* Keeps items at the top */
   align-items: center;
-  gap: 15px;
+  gap: 10px;
   margin: 0;
-  padding: 0 20px;
+  padding: 25vh 20px 0 20px; /* Pushes the whole group down from the top */
+}
+
+/* --- BYLINE STYLES (From Gone Too Soon) --- */
+.author-block {
+  margin-top: 0.5rem;
+  font-family: "Roboto", sans-serif;
+}
+
+.byline {
+  font-size: clamp(16px, 2.2vw, 20px);
+  font-weight: 400;
+  color: #a0a0a0; /* Using a muted gray to match your sub-title */
+  letter-spacing: 1px;
 }
 
 .title-main {
@@ -915,5 +931,65 @@ div[id^="g-"] {
     font-size: 20px;
     line-height: 1.5;
     padding: 0 25px;
+  }
+}
+
+/* --- SCROLL TO BEGIN COMPONENT --- */
+/* --- SCROLL TO BEGIN COMPONENT --- */
+.scroll-indicator {
+  /* Removing 'absolute' allows it to sit directly under the byline */
+  position: relative;
+
+  /* REDUCE THIS: This value controls the gap between byline and indicator */
+  margin-top: 30px;
+
+  text-align: center;
+  z-index: 200;
+  pointer-events: none;
+
+  /* COLOR RULE: Using gray (#888888) as a lighter shade of the black background */
+  color: #888888;
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.scroll-indicator p {
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}
+
+.arrow-wrapper svg {
+  display: block;
+  margin: 0 auto;
+  /* Ensures the SVG matches the #888888 color */
+  stroke: currentColor;
+}
+
+/* SPECIFIC OVERRIDES FOR MOBILE LANDSCAPE */
+@media (max-width: 950px) and (orientation: landscape) {
+  .content {
+    top: 65px !important; /* Pulls heading up to the top */
+  }
+
+  .content h2 {
+    font-size: 1.4rem !important;
+    margin-bottom: 2px !important;
+  }
+
+  .content p {
+    font-size: 0.9rem !important;
+    line-height: 1.2 !important;
+  }
+
+  #d3-legend,
+  #d3-age-legend {
+    top: 65px !important; /* Moves Gender Key up to align with heading */
+    right: 2vw !important;
+  }
+
+  .legend-item {
+    font-size: 13px !important;
   }
 }

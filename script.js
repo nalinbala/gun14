@@ -48,13 +48,17 @@ function renderIntro() {
 // ==========================================
 // RESPONSIVE DIMENSIONS & DOT SIZES
 // ==========================================
+// RESPONSIVE DIMENSIONS & DOT SIZES
 const svg = d3.select("#visual-stage");
 const width = window.innerWidth;
 const height = window.innerHeight;
 const isMobileView = width < 768;
 
-// Slightly reduced dot size to prevent crowding
-const radius = isMobileView ? 9 : 18;
+// NEW: Specific detection for phone landscape
+const isLandscape = isMobileView && width > height;
+
+// Adjust dot size: very small for landscape to fit rows
+const radius = isLandscape ? 7 : isMobileView ? 9 : 18;
 svg.attr("width", width).attr("height", height);
 
 // ==========================================
@@ -746,12 +750,28 @@ function applyGenderForces() {
   clearLabels();
   restoreGenderView();
 
-  const xM = isMobileView ? width / 2 : width / 3;
-  const xF = isMobileView ? width / 2 : (width / 3) * 2;
-  const yM = isMobileView ? height * 0.45 : height / 2;
-  const yF = isMobileView ? height * 0.75 : height / 2;
+  // LANDSCAPE: Horizontal Split (Male Left, Female Right)
+  const xM = isLandscape ? width * 0.35 : isMobileView ? width / 2 : width / 3;
+  const xF = isLandscape
+    ? width * 0.65
+    : isMobileView
+    ? width / 2
+    : (width / 3) * 2;
+  const yM = isLandscape
+    ? height * 0.65
+    : isMobileView
+    ? height * 0.45
+    : height / 2;
+  const yF = isLandscape
+    ? height * 0.65
+    : isMobileView
+    ? height * 0.75
+    : height / 2;
 
-  if (isMobileView) {
+  if (isLandscape) {
+    addSvgLabel("Male (54)", xM, yM + 90, "16px");
+    addSvgLabel("Female (6)", xF, yF + 90, "16px");
+  } else if (isMobileView) {
     addSvgLabel("Male (54)", xM, yM + 140, "20px");
     addSvgLabel("Female (6)", xF, yF + 60, "20px");
   } else {
@@ -760,8 +780,8 @@ function applyGenderForces() {
   }
 
   simulation
-    .force("x", d3.forceX((d) => (d.gender === "M" ? xM : xF)).strength(0.1))
-    .force("y", d3.forceY((d) => (d.gender === "M" ? yM : yF)).strength(0.1))
+    .force("x", d3.forceX((d) => (d.gender === "M" ? xM : xF)).strength(0.15))
+    .force("y", d3.forceY((d) => (d.gender === "M" ? yM : yF)).strength(0.15))
     .alpha(1)
     .restart();
 }
@@ -770,11 +790,28 @@ function applyMotivationForces() {
   clearLabels();
   restoreGenderView();
 
-  const xC = isMobileView ? width / 2 : width / 3;
-  const xP = isMobileView ? width / 2 : (width / 3) * 2;
-  const yC = isMobileView ? height * 0.45 : height / 2;
-  const yP = isMobileView ? height * 0.75 : height / 2;
-  if (isMobileView) {
+  // LANDSCAPE: Horizontal Split (Crime Left, Personal Right)
+  const xC = isLandscape ? width * 0.35 : isMobileView ? width / 2 : width / 3;
+  const xP = isLandscape
+    ? width * 0.65
+    : isMobileView
+    ? width / 2
+    : (width / 3) * 2;
+  const yC = isLandscape
+    ? height * 0.65
+    : isMobileView
+    ? height * 0.45
+    : height / 2;
+  const yP = isLandscape
+    ? height * 0.65
+    : isMobileView
+    ? height * 0.75
+    : height / 2;
+
+  if (isLandscape) {
+    addSvgLabel("Organised Crime (46)", xC, yC + 90, "16px");
+    addSvgLabel("Personal/Other (14)", xP, yP + 90, "16px");
+  } else if (isMobileView) {
     addSvgLabel("Organised Crime (46)", xC, yC + 130, "20px");
     addSvgLabel("Personal/Other (14)", xP, yP + 80, "20px");
   } else {
@@ -785,15 +822,16 @@ function applyMotivationForces() {
   simulation
     .force(
       "x",
-      d3.forceX((d) => (d.motive === "crime" ? xC : xP)).strength(0.1)
+      d3.forceX((d) => (d.motive === "crime" ? xC : xP)).strength(0.15)
     )
     .force(
       "y",
-      d3.forceY((d) => (d.motive === "crime" ? yC : yP)).strength(0.1)
+      d3.forceY((d) => (d.motive === "crime" ? yC : yP)).strength(0.15)
     )
     .alpha(1)
     .restart();
 }
+
 function applyDistrictForces() {
   clearLabels();
   restoreGenderView();
@@ -810,157 +848,72 @@ function applyDistrictForces() {
     "kurunegala",
     "ratnapura",
   ];
-
   const districtCounts = {};
   nodes.forEach(
     (d) => (districtCounts[d.district] = (districtCounts[d.district] || 0) + 1)
   );
 
-  if (isMobileView) {
-    // MOBILE VIEW: 3-Column Centered Grid
-    const cols = 3;
-    // MASSIVE FIX: Increased rowHeight and dotBaseY to prevent large clusters from overlapping
-    const rowHeight = 150;
-    const dotBaseY = 240;
+  // LANDSCAPE: 2 Rows of 5
+  const cols = isLandscape ? 5 : 3;
+  const rowHeight = isLandscape ? 100 : 150;
+  const dotBaseY = isLandscape ? height * 0.5 : 240;
 
-    districtsDesktop.forEach((dist, i) => {
-      const row = Math.floor(i / cols);
-      const col = i % cols;
+  districtsDesktop.forEach((dist, i) => {
+    const row = Math.floor(i / cols);
+    const col = i % cols;
+    const xPos = (col + 1) * (width / (cols + 1));
+    const yPosLabel = dotBaseY + row * rowHeight + (isLandscape ? 45 : 75);
 
-      // Automatically centers the bottom rows if they have fewer than 3 items
-      const itemsInThisRow = Math.min(
-        cols,
-        districtsDesktop.length - row * cols
-      );
-      const dynamicColWidth = width / (itemsInThisRow + 1);
-      const xPos = (col + 1) * dynamicColWidth;
+    const group = d3.select("#labels");
+    group
+      .append("text")
+      .attr("x", xPos)
+      .attr("y", yPosLabel)
+      .attr("text-anchor", "middle")
+      .style("font-size", isLandscape ? "12px" : "15px")
+      .style("font-weight", "bold")
+      .text(dist.charAt(0).toUpperCase() + dist.slice(1));
 
-      // Pushed label 75px down to safely clear the massive 18-dot Colombo cluster
-      const yPosLabel = dotBaseY + row * rowHeight + 75;
+    group
+      .append("circle")
+      .attr("cx", xPos)
+      .attr("cy", yPosLabel + (isLandscape ? 15 : 25))
+      .attr("r", isLandscape ? 10 : 14)
+      .style("fill", "#000");
+    group
+      .append("text")
+      .attr("x", xPos)
+      .attr("y", yPosLabel + (isLandscape ? 15 : 25))
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "middle")
+      .style("fill", "#fff")
+      .style("font-size", isLandscape ? "10px" : "13px")
+      .text(districtCounts[dist] || 0);
+  });
 
-      const group = d3.select("#labels");
-
-      // Text Label
-      group
-        .append("text")
-        .attr("x", xPos)
-        .attr("y", yPosLabel)
-        .attr("text-anchor", "middle")
-        .style("font-size", "15px")
-        .style("font-weight", "bold")
-        .style("fill", "#1a1a1a")
-        .text(dist.charAt(0).toUpperCase() + dist.slice(1));
-
-      // Restored Black Badge
-      group
-        .append("circle")
-        .attr("cx", xPos)
-        .attr("cy", yPosLabel + 25)
-        .attr("r", 14)
-        .style("fill", "#000");
-
-      // Restored Number
-      group
-        .append("text")
-        .attr("x", xPos)
-        .attr("y", yPosLabel + 25)
-        .attr("dy", "0.35em")
-        .attr("text-anchor", "middle")
-        .style("fill", "#fff")
-        .style("font-size", "13px")
-        .text(districtCounts[dist] || 0);
-    });
-
-    simulation
-      .force(
-        "x",
-        d3
-          .forceX((d) => {
-            const i = districtsDesktop.indexOf(d.district);
-            const row = Math.floor(i / cols);
-            const col = i % cols;
-            const itemsInThisRow = Math.min(
-              cols,
-              districtsDesktop.length - row * cols
-            );
-            const dynamicColWidth = width / (itemsInThisRow + 1);
-            return (col + 1) * dynamicColWidth;
-          })
-          .strength(0.8)
-      )
-      .force(
-        "y",
-        d3
-          .forceY((d) => {
-            const i = districtsDesktop.indexOf(d.district);
-            const row = Math.floor(i / cols);
-            return dotBaseY + row * rowHeight;
-          })
-          .strength(0.8)
-      )
-      .alpha(1)
-      .restart();
-  } else {
-    // DESKTOP VIEW: Split into two rows of 5
-    const colsDesk = 5;
-    const colWidthDesk = width / (colsDesk + 1);
-    const rowHeightDesk = height * 0.32;
-    const dotBaseYDesk = height * 0.4;
-
-    districtsDesktop.forEach((dist, i) => {
-      let xPos = ((i % colsDesk) + 1) * colWidthDesk;
-      let yPosLabel =
-        dotBaseYDesk + Math.floor(i / colsDesk) * rowHeightDesk + 90;
-
-      const group = d3.select("#labels");
-      group
-        .append("text")
-        .attr("x", xPos)
-        .attr("y", yPosLabel)
-        .attr("text-anchor", "middle")
-        .style("font-size", "22px")
-        .style("font-weight", "bold")
-        .style("fill", "#1a1a1a")
-        .text(dist.charAt(0).toUpperCase() + dist.slice(1));
-      group
-        .append("circle")
-        .attr("cx", xPos)
-        .attr("cy", yPosLabel + 35)
-        .attr("r", 18)
-        .style("fill", "#000");
-      group
-        .append("text")
-        .attr("x", xPos)
-        .attr("y", yPosLabel + 35)
-        .attr("dy", "0.35em")
-        .attr("text-anchor", "middle")
-        .style("fill", "#fff")
-        .style("font-size", "16px")
-        .text(districtCounts[dist] || 0);
-    });
-
-    simulation
-      .force(
-        "x",
-        d3
-          .forceX((d) => {
-            const i = districtsDesktop.indexOf(d.district);
-            return ((i % colsDesk) + 1) * colWidthDesk;
-          })
-          .strength(0.8)
-      )
-      .force(
-        "y",
-        d3
-          .forceY((d) => {
-            const i = districtsDesktop.indexOf(d.district);
-            return dotBaseYDesk + Math.floor(i / colsDesk) * rowHeightDesk;
-          })
-          .strength(0.8)
-      )
-      .alpha(1)
-      .restart();
-  }
+  simulation
+    .force(
+      "x",
+      d3
+        .forceX(
+          (d) =>
+            ((districtsDesktop.indexOf(d.district) % cols) + 1) *
+            (width / (cols + 1))
+        )
+        .strength(0.8)
+    )
+    .force(
+      "y",
+      d3
+        .forceY(
+          (d) =>
+            dotBaseY +
+            Math.floor(districtsDesktop.indexOf(d.district) / cols) * rowHeight
+        )
+        .strength(0.8)
+    )
+    .alpha(1)
+    .restart();
 }
 
 function applyMonthForces() {
@@ -981,156 +934,72 @@ function applyMonthForces() {
     "November",
     "December",
   ];
-
-  // Count incidents per month
   const monthCounts = {};
   nodes.forEach(
     (d) => (monthCounts[d.month] = (monthCounts[d.month] || 0) + 1)
   );
 
-  if (isMobileView) {
-    // MOBILE VIEW: 3 columns x 4 rows
-    const cols = 3;
-    const rowHeight = 125;
-    const dotBaseY = 220; // Pushed down to clear the top text
+  // LANDSCAPE: 2 Rows of 6
+  const cols = isLandscape ? 6 : 3;
+  const rowHeight = isLandscape ? 90 : 125;
+  const dotBaseY = isLandscape ? height * 0.45 : 220;
 
-    monthsTimeline.forEach((month, i) => {
-      const row = Math.floor(i / cols);
-      const col = i % cols;
+  monthsTimeline.forEach((month, i) => {
+    const row = Math.floor(i / cols);
+    const col = i % cols;
+    const xPos = (col + 1) * (width / (cols + 1));
+    const yPosLabel = dotBaseY + row * rowHeight + (isLandscape ? 40 : 55);
 
-      const dynamicColWidth = width / (cols + 1);
-      const xPos = (col + 1) * dynamicColWidth;
+    const group = d3.select("#labels");
+    group
+      .append("text")
+      .attr("x", xPos)
+      .attr("y", yPosLabel)
+      .attr("text-anchor", "middle")
+      .style("font-size", isLandscape ? "11px" : "14px")
+      .style("font-weight", "bold")
+      .text(month.substring(0, 3));
+    group
+      .append("circle")
+      .attr("cx", xPos)
+      .attr("cy", yPosLabel + (isLandscape ? 14 : 22))
+      .attr("r", isLandscape ? 9 : 12)
+      .style("fill", "#000");
+    group
+      .append("text")
+      .attr("x", xPos)
+      .attr("y", yPosLabel + (isLandscape ? 14 : 22))
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "middle")
+      .style("fill", "#fff")
+      .style("font-size", isLandscape ? "9px" : "12px")
+      .text(monthCounts[month] || 0);
+  });
 
-      // Position the label below each month's cluster
-      const yPosLabel = dotBaseY + row * rowHeight + 55;
-
-      const group = d3.select("#labels");
-
-      // Abbreviate month names for mobile to prevent overlap (Jan, Feb, etc.)
-      group
-        .append("text")
-        .attr("x", xPos)
-        .attr("y", yPosLabel)
-        .attr("text-anchor", "middle")
-        .style("font-size", "14px")
-        .style("font-weight", "bold")
-        .style("fill", "#1a1a1a")
-        .text(month.substring(0, 3));
-
-      // Black badge background
-      group
-        .append("circle")
-        .attr("cx", xPos)
-        .attr("cy", yPosLabel + 22)
-        .attr("r", 12)
-        .style("fill", "#000");
-
-      // Number count inside badge
-      group
-        .append("text")
-        .attr("x", xPos)
-        .attr("y", yPosLabel + 22)
-        .attr("dy", "0.35em")
-        .attr("text-anchor", "middle")
-        .style("fill", "#fff")
-        .style("font-size", "12px")
-        .text(monthCounts[month] || 0);
-    });
-
-    // Apply the physics forces to move the bubbles to their grid spots
-    simulation
-      .force(
-        "x",
-        d3
-          .forceX((d) => {
-            const i = monthsTimeline.indexOf(d.month);
-            const col = i % cols;
-            return (col + 1) * (width / (cols + 1));
-          })
-          .strength(0.8)
-      )
-      .force(
-        "y",
-        d3
-          .forceY((d) => {
-            const i = monthsTimeline.indexOf(d.month);
-            const row = Math.floor(i / cols);
-            return dotBaseY + row * rowHeight;
-          })
-          .strength(0.8)
-      )
-      .alpha(1)
-      .restart();
-  } else {
-    // DESKTOP VIEW: 6 columns x 2 rows
-    const colsDesk = 6;
-    const colWidthDesk = width / (colsDesk + 1);
-    const rowHeightDesk = height * 0.35;
-    const dotBaseYDesk = height * 0.35;
-
-    monthsTimeline.forEach((month, i) => {
-      let xPos = ((i % colsDesk) + 1) * colWidthDesk;
-      let yPosLabel =
-        dotBaseYDesk + Math.floor(i / colsDesk) * rowHeightDesk + 80;
-
-      const group = d3.select("#labels");
-
-      // Full month name for desktop
-      group
-        .append("text")
-        .attr("x", xPos)
-        .attr("y", yPosLabel)
-        .attr("text-anchor", "middle")
-        .style("font-size", "18px")
-        .style("font-weight", "bold")
-        .style("fill", "#1a1a1a")
-        .text(month);
-
-      // Black badge background
-      group
-        .append("circle")
-        .attr("cx", xPos)
-        .attr("cy", yPosLabel + 30)
-        .attr("r", 16)
-        .style("fill", "#000");
-
-      // Number count inside badge
-      group
-        .append("text")
-        .attr("x", xPos)
-        .attr("y", yPosLabel + 30)
-        .attr("dy", "0.35em")
-        .attr("text-anchor", "middle")
-        .style("fill", "#fff")
-        .style("font-size", "14px")
-        .text(monthCounts[month] || 0);
-    });
-
-    // Apply the physics forces
-    simulation
-      .force(
-        "x",
-        d3
-          .forceX((d) => {
-            const i = monthsTimeline.indexOf(d.month);
-            return ((i % colsDesk) + 1) * colWidthDesk;
-          })
-          .strength(0.8)
-      )
-      .force(
-        "y",
-        d3
-          .forceY((d) => {
-            const i = monthsTimeline.indexOf(d.month);
-            return dotBaseYDesk + Math.floor(i / colsDesk) * rowHeightDesk;
-          })
-          .strength(0.8)
-      )
-      .alpha(1)
-      .restart();
-  }
+  simulation
+    .force(
+      "x",
+      d3
+        .forceX(
+          (d) =>
+            ((monthsTimeline.indexOf(d.month) % cols) + 1) *
+            (width / (cols + 1))
+        )
+        .strength(0.8)
+    )
+    .force(
+      "y",
+      d3
+        .forceY(
+          (d) =>
+            dotBaseY +
+            Math.floor(monthsTimeline.indexOf(d.month) / cols) * rowHeight
+        )
+        .strength(0.8)
+    )
+    .alpha(1)
+    .restart();
 }
-
 /* ========================================= */
 /* STRICT LEGEND SWAPPER                     */
 /* ========================================= */
@@ -1196,4 +1065,25 @@ ScrollTrigger.create({
   start: "top center",
   onEnter: () => document.body.classList.add("show-legends"),
   onLeaveBack: () => document.body.classList.remove("show-legends"),
+});
+
+// Gentle bounce for the arrow
+gsap.to(".arrow-wrapper", {
+  y: 10,
+  repeat: -1,
+  yoyo: true,
+  ease: "power1.inOut",
+  duration: 1.2,
+});
+
+// Fade out as names-text enters the viewport
+gsap.to(".scroll-indicator", {
+  scrollTrigger: {
+    trigger: ".names-text",
+    start: "top bottom", // Starts fading when the names reach the bottom of the screen
+    end: "top 70%", // Fully gone by the time names are 30% up the screen
+    scrub: true,
+  },
+  opacity: 0,
+  visibility: "hidden",
 });
