@@ -993,3 +993,16 @@ div[id^="g-"] {
     font-size: 13px !important;
   }
 }
+/* Isolated landscape override for the HTML titles */
+@media (max-width: 950px) and (orientation: landscape) {
+  .content {
+    top: 65px !important;
+  }
+  .content h1 {
+    font-size: 1.4rem !important;
+  }
+  .content p {
+    font-size: 0.9rem !important;
+    line-height: 1.2 !important;
+  }
+}

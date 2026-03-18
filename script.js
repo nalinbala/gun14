@@ -52,7 +52,7 @@ const svg = d3.select("#visual-stage");
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-// Define this FIRST so the lines below can use it
+// Define this first so landscape logic can use it
 const isMobileView = width < 768;
 
 // NEW: Strict landscape detection for mobile
@@ -640,18 +640,33 @@ function applyTotalForces() {
   clearLabels();
   restoreGenderView();
 
-  // MATCHING MOCKUP 1: Tighter cluster, bold label right below it
-  const yCenter = isMobileView ? height * 0.55 : height / 2;
+  // Set the vertical center: Landscape pushes it down to clear the HTML title
+  let yCenter = isMobileView ? height * 0.55 : height / 2;
 
-  if (isMobileView) {
+  if (isLandscape) {
+    yCenter = height * 0.6; // Pushes cluster down for landscape view
+    addSvgLabel("60 Lives Lost", width / 2, yCenter + 75, "16px");
+  } else if (isMobileView) {
+    // This is your original portrait logic
     addSvgLabel("60 Lives Lost", width / 2, yCenter + 150, "20px");
   } else {
+    // This is your original desktop logic
     addSvgLabel("60 Lives Lost", width / 2, yCenter + 200, "26px");
   }
 
   simulation
-    .force("x", d3.forceX(width / 2).strength(isMobileView ? 0.12 : 0.08))
-    .force("y", d3.forceY(yCenter).strength(isMobileView ? 0.12 : 0.08))
+    .force(
+      "x",
+      d3
+        .forceX(width / 2)
+        .strength(isLandscape ? 0.15 : isMobileView ? 0.12 : 0.08)
+    )
+    .force(
+      "y",
+      d3
+        .forceY(yCenter)
+        .strength(isLandscape ? 0.15 : isMobileView ? 0.12 : 0.08)
+    )
     .alpha(1)
     .restart();
 }
