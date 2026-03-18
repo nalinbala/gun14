@@ -1065,3 +1065,20 @@ div[id^="g-"] {
     width: 90vw !important;
   }
 }
+
+/* --- MOBILE LANDSCAPE KILL SWITCH --- */
+@media (max-width: 950px) and (orientation: landscape) {
+  /* Hide the bubbles, labels, legends, AND the scrollytelling text area */
+  #visual-stage,
+  #d3-legend,
+  #d3-age-legend,
+  .content {
+    display: none !important;
+  }
+
+  /* Reset the scrollytelling container height if needed to prevent a large empty gap */
+  .d3-scrollytelling {
+    height: 0 !important;
+    overflow: hidden;
+  }
+}
