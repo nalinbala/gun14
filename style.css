@@ -1006,3 +1006,25 @@ div[id^="g-"] {
     line-height: 1.2 !important;
   }
 }
+
+/* TARGETED LANDSCAPE OVERRIDES */
+@media (max-width: 950px) and (orientation: landscape) {
+  /* Move HTML text up */
+  .content {
+    top: 65px !important;
+  }
+  .content h1 {
+    font-size: 1.3rem !important;
+    margin-bottom: 2px !important;
+  }
+  .content p {
+    font-size: 0.85rem !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Move Gender Key up to align with text */
+  #d3-legend {
+    top: 70px !important;
+    right: 3vw !important;
+  }
+}

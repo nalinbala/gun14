@@ -52,13 +52,13 @@ const svg = d3.select("#visual-stage");
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-// Define this first so landscape logic can use it
+// 1. Define mobile first
 const isMobileView = width < 768;
 
-// NEW: Strict landscape detection for mobile
+// 2. Define landscape based on mobile
 const isLandscape = isMobileView && width > height;
 
-// Only shrink radius for landscape; leave portrait/desktop as they were
+// 3. Set specific radius: 7 for landscape, 9 for portrait, 18 for desktop
 const radius = isLandscape ? 7 : isMobileView ? 9 : 18;
 
 svg.attr("width", width).attr("height", height);
@@ -640,33 +640,27 @@ function applyTotalForces() {
   clearLabels();
   restoreGenderView();
 
-  // Set the vertical center: Landscape pushes it down to clear the HTML title
-  let yCenter = isMobileView ? height * 0.55 : height / 2;
+  // Set specific centers for different devices
+  let xCenter = width / 2;
+  let yCenter = height / 2;
 
   if (isLandscape) {
-    yCenter = height * 0.6; // Pushes cluster down for landscape view
-    addSvgLabel("60 Lives Lost", width / 2, yCenter + 75, "16px");
+    yCenter = height * 0.58; // Lower center to avoid HTML text at top
+    addSvgLabel("60 Lives Lost", xCenter, yCenter + 75, "16px");
   } else if (isMobileView) {
-    // This is your original portrait logic
-    addSvgLabel("60 Lives Lost", width / 2, yCenter + 150, "20px");
+    yCenter = height * 0.55;
+    addSvgLabel("60 Lives Lost", xCenter, yCenter + 150, "20px");
   } else {
-    // This is your original desktop logic
-    addSvgLabel("60 Lives Lost", width / 2, yCenter + 200, "26px");
+    addSvgLabel("60 Lives Lost", xCenter, yCenter + 200, "26px");
   }
 
+  // Update simulation physics for the smaller landscape dots
+  simulation.force("collide").radius(radius + 1.5);
+  nodeElements.transition().duration(500).attr("r", radius);
+
   simulation
-    .force(
-      "x",
-      d3
-        .forceX(width / 2)
-        .strength(isLandscape ? 0.15 : isMobileView ? 0.12 : 0.08)
-    )
-    .force(
-      "y",
-      d3
-        .forceY(yCenter)
-        .strength(isLandscape ? 0.15 : isMobileView ? 0.12 : 0.08)
-    )
+    .force("x", d3.forceX(xCenter).strength(isLandscape ? 0.2 : 0.1))
+    .force("y", d3.forceY(yCenter).strength(isLandscape ? 0.2 : 0.1))
     .alpha(1)
     .restart();
 }
